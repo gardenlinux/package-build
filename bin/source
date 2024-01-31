@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+
+set -exuo pipefail
+shopt -s nullglob
+
+auto_decompress() (
+	case "${1##*.}" in
+		gz)
+			gzip -d < "$1"
+			;;
+		xz)
+			xz -d < "$1"
+			;;
+		bz2)
+			bzip2 -d < "$1"
+			;;
+		*)
+			exit 1
+			;;
+	esac
+)
+
+apt_src() (
+	ignore_orig=false
+	if [ "$1" = "--ignore-orig" ]; then
+		ignore_orig=true
+		shift
+	fi
+
+	tmp_dir="$(mktemp -d)"
+	trap 'cd / && rm -rf "$tmp_dir"' EXIT
+	cd "$tmp_dir"
+
+	apt-get source --only-source --download-only "$1"
+
+	orig=(*.orig.tar.*)
+	if [ -n "${orig[*]}" ]; then
+		[ "$ignore_orig" = true ] || auto_decompress "$orig" | tee "$dir/orig.tar" | tar --extract --strip-components 1 --directory "$dir/src"
+		rm "${orig[@]}"
+	fi
+
+	diff=(*.debian.tar.*)
+	if [ -n "${diff[*]}" ]; then
+		auto_decompress "$diff" | tar --extract --directory "$dir/src"
+		rm "${diff[@]}"
+	else
+		native=(*.tar.*)
+		auto_decompress "$native" | tar --extract --strip-components 1 --directory "$dir/src"
+		rm "${native[@]}"
+	fi
+)
+
+git_src() (
+	tmp_dir="$(mktemp -d)"
+	trap 'cd / && rm -rf "$tmp_dir"' EXIT
+
+	git clone --depth 1 --recurse-submodules "$@" "$tmp_dir"
+	cd "$tmp_dir"
+	git ls-files --recurse-submodules -z | tar --create --xform s:^:_/: --null --files-from - | tee "$dir/orig.tar" | tar --extract --strip-components 1 --directory "$dir/src"
+)
+
+import_src() (
+	cp -r "$1/." "$dir/src/."
+)
+
+apply_patches() (
+	patch_dir="${1-patches}"
+	if [ -f "$patch_dir/series" ]; then
+		while read -r patch; do
+			(cd "$dir/src" && patch -p1;) < "$patch_dir/$patch"
+		done < "$patch_dir/series"
+	fi
+)
+
+email="contact@gardenlinux.io"
+maintainer="Garden Linux Builder"
+distribution=gardenlinux
+message="Rebuild for Garden Linux."
+version=
+version_suffix=gardenlinux~dev
+
+dir="$(mktemp -d)"
+trap 'cd / && rm -rf "$dir"' EXIT
+
+mkdir "$dir/src"
+
+. prepare_source
+
+[ -n "$version" ] || version="$(cd "$dir/src" && dpkg-parsechangelog --show-field Version)"
+
+if [ -e "$dir/src/debian/changelog" ]; then
+	(cd "$dir/src" && DEBEMAIL="$email" DEBFULLNAME="$maintainer" dch --newversion "$version$version_suffix" --distribution "$distribution" --force-distribution -- "$message";)
+else
+	(cd "$dir/src" && DEBEMAIL="$email" DEBFULLNAME="$maintainer" dch --create --package "$pkg" --newversion "$version$version_suffix" --distribution "$distribution" -- "$message";)
+fi
+
+pkg="$(cd "$dir/src" && dpkg-parsechangelog --show-field Source)"
+version="$(cd "$dir/src" && dpkg-parsechangelog --show-field Version)"
+version_orig="${version%-*}"
+
+if [ "$version" != "$version_orig" ]; then
+	xz < "$dir/orig.tar" > "$dir/${pkg}_${version_orig#*:}.orig.tar.xz"
+fi
+if [ -e "$dir/orig.tar" ]; then
+	rm "$dir/orig.tar"
+fi
+
+chown -R user:users "$dir"
+(
+	cd "$dir/src"
+	su -s /bin/sh -c 'dpkg-source --build .' user
+)
+rm -rf "$dir/src"
+
+mkdir -p .build
+cp -r "$dir/." .build/.
