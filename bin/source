@@ -105,6 +105,10 @@ if [ -e "$dir/orig.tar" ]; then
 	rm "$dir/orig.tar"
 fi
 
+if [ -f finalize_source ]; then
+	. finalize_source
+fi
+
 chown -R user:users "$dir"
 (
 	cd "$dir/src"
