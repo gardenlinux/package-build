@@ -10,6 +10,12 @@ on:
       runs-on:
         type: string
         default: ubuntu-latest
+      runs-on-amd64:
+        type: string
+        default: ubuntu-latest
+      runs-on-arm64:
+        type: string
+        default: ubuntu-latest-arm
 jobs:
   source:
     runs-on: ubuntu-latest
@@ -21,13 +27,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: resolve container digest
-        if: inputs.release
         run: |
-          set -o noclobber
-          image="ghcr.io/gardenlinux/repo-debian-snapshot"
-          podman pull "$image"
-          digest="$(podman image inspect --format '{{ .Digest }}' "$image")"
-          echo "$image@$digest" > .container
+          if [ ! -e .container ]; then
+            image="ghcr.io/gardenlinux/repo-debian-snapshot"
+            podman pull "$image"
+            digest="$(podman image inspect --format '{{ .Digest }}' "$image")"
+            echo "$image@$digest" > .container
+          fi
       - name: set release version suffix
         if: inputs.release
         run: |
@@ -43,7 +49,7 @@ jobs:
       - name: build source pkg
         run: |
           dir="$(mktemp -d)"
-          git clone --depth=1 https://github.com/gardenlinux/package-build "$dir/package-build"
+          git clone --depth=1 --branch arm-runner https://github.com/gardenlinux/package-build "$dir/package-build"
           "$dir/package-build/build" --source-only .
       - uses: actions/upload-artifact@v4
         with:
@@ -60,7 +66,7 @@ jobs:
           version="${version#*:}"
           echo "pkg=$pkg" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          if [[ "$version" != *"~dev" ]]; then
+          if [[ "$version" != *"+dev" ]]; then
             git fetch --tags
             if git rev-list "$version" > /dev/null 2>&1; then
               echo "$version already exists"
@@ -74,7 +80,7 @@ jobs:
             echo skip_release=true >> "$GITHUB_OUTPUT"
           fi
   binary:
-    runs-on: ${{ inputs.runs-on }}
+    runs-on: ${{ matrix.arch == 'amd64' && inputs.runs-on-amd64 || matrix.arch == 'arm64' && inputs.runs-on-arm64 || inputs.run-on }}
     needs: source
     if: ${{ ! needs.source.outputs.skip_build }}
     strategy:
@@ -84,9 +90,14 @@ jobs:
           - amd64
           - arm64
     steps:
-      - name: setup binfmt
-        if: matrix.arch == 'arm64'
-        run: sudo podman run --privileged ghcr.io/gardenlinux/binfmt_container
+      - if: matrix.arch == 'amd64'
+        run: |
+          sudo rm -rf /{usr/{local/{lib/{android,heroku},.ghcup,share/{dotnet,powershell,miniconda,swift}},share/{dotnet,miniconda,swift}},opt/{hostedtoolcache,microsoft},imagegeneration}
+          sudo docker system prune -a -f
+      - if: matrix.arch == 'arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends podman uidmap slirp4netns
       - uses: actions/download-artifact@v4
         with:
           name: source
@@ -106,7 +117,7 @@ jobs:
       - name: build binary pkg
         run: |
           dir="$(mktemp -d)"
-          git clone --depth=1 https://github.com/gardenlinux/package-build "$dir/package-build"
+          git clone --depth=1 --branch arm-runner https://github.com/gardenlinux/package-build "$dir/package-build"
           arch="${{ matrix.arch }}"
           build=binary
           if [ "$arch" = arm64 ]; then

@@ -3,8 +3,8 @@
 set -exuo pipefail
 shopt -s nullglob
 
-DEB_BUILD_OPTIONS="terse nocheck nodoc"
-DEB_BUILD_PROFILES="nocheck nodoc"
+DEB_BUILD_OPTIONS="terse nocheck nodoc noudeb"
+DEB_BUILD_PROFILES="nocheck nodoc noudeb"
 
 dir="$(mktemp -d)"
 trap 'cd / && rm -rf "$dir"' EXIT
