@@ -72,6 +72,22 @@ apply_patches() (
 	fi
 )
 
+import_upstream_patches() (
+	patch_dir="${1-upstream_patches}"
+	if [ -f "$patch_dir/series" ]; then
+		while read -r patch; do
+			if [ -e "$dir/src/debian/patches/$patch" ]; then
+				echo "patch $patch already exists in debian/patches" >&2
+				exit 1
+			fi
+
+			mkdir -p "$(dirname "$dir/src/debian/patches/$patch")"
+			cp "$patch_dir/$patch" "$dir/src/debian/patches/$patch"
+			echo "$patch" >> "$dir/src/debian/patches/series"
+		done < "$patch_dir/series"
+	fi
+)
+
 email="contact@gardenlinux.io"
 maintainer="Garden Linux Builder"
 distribution=gardenlinux
