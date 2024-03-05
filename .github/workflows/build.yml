@@ -49,7 +49,7 @@ jobs:
       - name: build source pkg
         run: |
           dir="$(mktemp -d)"
-          git clone --depth=1 --branch arm-runner https://github.com/gardenlinux/package-build "$dir/package-build"
+          git clone --depth=1 https://github.com/gardenlinux/package-build "$dir/package-build"
           "$dir/package-build/build" --source-only .
       - uses: actions/upload-artifact@v4
         with:
@@ -117,7 +117,7 @@ jobs:
       - name: build binary pkg
         run: |
           dir="$(mktemp -d)"
-          git clone --depth=1 --branch arm-runner https://github.com/gardenlinux/package-build "$dir/package-build"
+          git clone --depth=1 https://github.com/gardenlinux/package-build "$dir/package-build"
           arch="${{ matrix.arch }}"
           build=binary
           if [ "$arch" = arm64 ]; then
