@@ -28,15 +28,18 @@ uses: gardenlinux/package-build/.github/workflows/build.yml@main
 
 The GitHub action jobs accepts various inputs:
 
-- `release` (*boolean*):  
-   Flag if this is a release build.
-   If set to `true` this will cause the build job to automatically append `gardenlinux0` as the version suffix and create a GitHub release from the resulting source and binary packages.
-- `build_dep` (*string*):  
-   A list of other GitHub repositories to pull custom build-time dependencies from. In the format `<repo> <tag>`
-   > [!Important]
-   > Build-time dependencies between packages are not updated automatically and need to be adjusted manually when needed
-- `runs-on`, `runs-on-amd64`, `runs-on-arm64` (*string*):  
-   Specify the GitHub action runner on which to run the job
+#### `release` (*boolean*)
+Flag if this is a release build.
+If set to `true` this will cause the build job to automatically append `gardenlinux0` as the version suffix and create a GitHub release from the resulting source and binary packages.
+
+#### `build_dep` (*string*)
+A list of other GitHub repositories to pull custom build-time dependencies from. In the format `<repo> <tag>`
+
+> [!Important]
+> Build-time dependencies between packages are not updated automatically and need to be adjusted manually when needed
+
+#### `runs-on`, `runs-on-amd64`, `runs-on-arm64` (*string*)
+Specify the GitHub action runner on which to run the job
 
 ### Example
 
