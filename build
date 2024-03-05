@@ -46,7 +46,11 @@ done
 dir="$(realpath "$1")"
 
 if [ -z "$container" ]; then
-	container="$(cat "$dir/.container")"
+	if [ -e "$dir/.container" ]; then
+		container="$(cat "$dir/.container")"
+	else
+		container=ghcr.io/gardenlinux/repo-debian-snapshot
+	fi
 fi
 
 mount_opts=(
