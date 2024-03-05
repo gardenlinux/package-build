@@ -57,3 +57,23 @@ jobs:
     with:
       release: ${{ github.ref == 'refs/heads/main' }}
 ```
+
+### Patch releases
+
+When running the GitHub action job with `release: true` it automatically creates a new release with version suffix `gardenlinux0`.
+To create a patch release for this version:
+
+1. Check out the release tag and branch off from it
+   ```
+   git fetch --tags
+   git checkout <VERSION>gardenlinux0
+   git branch <VERSION>
+   git checkout <VERSION>
+   ```
+2. Apply modifications or backport patches from main
+3. Increment the version suffix. The GitHub action job which created the `<VERSION>gardenlinux0` tag automatically added a `version_suffix=gardenlinux0` line to the `prepare_source` script. Simply increment this suffix.
+4. Push the branch
+   ```
+   git push origin <VERSION>
+   ```
+   If the action is setup to run on `push`, as in the example above, this will trigger the build job to run which detects that this is a new version and thus causes it to be released, setting up the necessary tags and GitHub releases.
