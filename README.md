@@ -16,6 +16,8 @@
    ```
    - *optional*: If a package build depends on other custom build packages you can provide the `--build-dependencies` flag with a directory containing the `.deb` files of build-time dependencies
 
+The build artifacts (`deb` files and others) are placed in a `.build` directory in your package, for example in `./package-iproute2/.build/`.
+
 ## GitHub action build
 
 To build using GitHub actions simply define a job with
