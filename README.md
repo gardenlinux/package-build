@@ -16,6 +16,17 @@
    ```
    - *optional*: If a package build depends on other custom build packages you can provide the `--build-dependencies` flag with a directory containing the `.deb` files of build-time dependencies
 
+The build artifacts (`deb` files and others) are placed in a `.build` directory in your package, for example in `./package-iproute2/.build/`.
+
+### Build options
+
+The `build` script takes arguments which may be used to customize the build.
+
+- `--arch amd64`: Specify the architecture to build
+   - Choices: `amd64` (default), `arm64` 
+- `--source-only`: Only build source archive
+- `--binary-only`: Only build the binary archives
+
 ## GitHub action build
 
 To build using GitHub actions simply define a job with
