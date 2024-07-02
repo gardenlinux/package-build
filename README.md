@@ -47,6 +47,12 @@ Use source code from a local path (todo: how does that work?)
 
 `apply_patched [patch_dir(default=./patches)]`
 
+Apply patches from a directory.
+By convention the directory is called `patches`.
+Another name may be chosen and passed as a parameter.
+
+The `patches` directory requires a `series` file listing the patches in the order to be applied, and the patch files.
+
 `import_upstream_patches [patch_dir(default=./upstream_patches)]`
 
 ### `prepare_binary`
