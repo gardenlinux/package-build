@@ -27,6 +27,30 @@ The `build` script takes arguments which may be used to customize the build.
 - `--source-only`: Only build source archive
 - `--binary-only`: Only build the binary archives
 
+## Package build API
+
+Package builds make use of shell functions which are defined in this repo.
+
+### `prepare_source`
+
+`apt_src [--ignore-orig] $package_name`
+
+Use source code from a given apt source package.
+
+`git_src $git_url`
+
+Use source code from a remote git repository
+
+`import_src $path`
+
+Use source code from a local path (todo: how does that work?)
+
+`apply_patched [patch_dir(default=./patches)]`
+
+`import_upstream_patches [patch_dir(default=./upstream_patches)]`
+
+### `prepare_binary`
+
 ## GitHub action build
 
 To build using GitHub actions simply define a job with
