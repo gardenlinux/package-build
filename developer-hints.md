@@ -55,6 +55,12 @@ It helps to be familiar with [quilt](https://en.wikipedia.org/wiki/Quilt_(softwa
 
 [tldr cheat sheet for quilt](https://tldr.inbrowser.app/pages/common/quilt)
 
+Required configuration
+
+```bash
+export QUILT_PATCHES=debian/patches
+```
+
 Useful commands:
 
 `quilt push` apply a single patch
@@ -64,3 +70,4 @@ Useful commands:
 `quilt push -f` force apply patches
 
 `quilt refresh` update patch files after manually editing source
+
