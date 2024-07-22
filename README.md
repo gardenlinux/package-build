@@ -69,7 +69,7 @@ jobs:
       release: ${{ github.ref == 'refs/heads/main' }}
 ```
 
-### Patch releases
+### Patch releases / backporting
 
 When running the GitHub action job with `release: true` it automatically creates a new release with version suffix `gardenlinux0`.
 To create a patch release for this version:
@@ -82,7 +82,7 @@ To create a patch release for this version:
    git checkout <VERSION>
    ```
 2. Apply modifications or backport patches from main
-3. Increment the version suffix. The GitHub action job which created the `<VERSION>gardenlinux0` tag automatically added a `version_suffix=gardenlinux0` line to the `prepare_source` script. Simply increment this suffix.
+3. Increment the version suffix. The GitHub action job which created the `<VERSION>gardenlinux0` tag automatically added a `version_suffix=gardenlinux0` line to the `prepare_source` script. Simply increment this suffix. In certain scenarios you might want to backport this to an older GardenLinux version; in this case you will need to also update the _.containerfile_ and use the proper one; e.g. _ghcr.io/gardenlinux/repo-debian-snapshot@sha256:3577da968aa41816bf255e189925c6c67df1266effe800a7d0cd66cddc5760ca_ for version 1443.
 4. Push the branch
    ```
    git push origin <VERSION>
