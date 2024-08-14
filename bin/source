@@ -101,7 +101,7 @@ if [ -z "${gl_package_build_debug+x}" ]; then
   trap 'cd / && rm -rf "$dir"' EXIT
 else
   trap 'echo $dir' EXIT
-  echo "Linux sources are located in:"
+  echo "Package sources are located in:"
   echo "\t$dir"
 fi
 
