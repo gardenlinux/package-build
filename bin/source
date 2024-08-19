@@ -31,7 +31,17 @@ apt_src() (
 	trap 'cd / && rm -rf "$tmp_dir"' EXIT
 	cd "$tmp_dir"
 
-	apt-get source --only-source --download-only "$1"
+	# if the src repo provides multiple sources for the same package
+	# download the src with the same version as the candidate
+	if [[ "$1" = *=* ]]; then
+		# specific version requested, do nothing
+		pkg="$1"
+	else
+		candidate=$(apt-cache policy "$1" | grep Candidate | cut -d: -f 2 | tr -d "[:blank:]")
+		pkg="${1}=${candidate}"
+	fi
+
+	apt-get source --only-source --download-only "$pkg"
 
 	orig=(*.orig.tar.*)
 	if [ -n "${orig[*]}" ]; then
