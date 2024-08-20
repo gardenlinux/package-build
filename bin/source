@@ -20,6 +20,14 @@ auto_decompress() (
 	esac
 )
 
+
+# Usage:
+# apt_src [--ignore-orig] <package_name>[=<version>]
+#
+# Downloads and extracts the source files of a Debian package.
+# - With <package_name>=<version>, fetches the specific version.
+# - With --ignore-orig, skips processing the original source archive (*.orig.tar.*).
+# If no version is provided, it downloads the candidate version.
 apt_src() (
 	ignore_orig=false
 	if [ "$1" = "--ignore-orig" ]; then
