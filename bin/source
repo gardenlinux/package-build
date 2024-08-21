@@ -45,7 +45,18 @@ apt_src() (
 		# specific version requested, do nothing
 		pkg="$1"
 	else
-		candidate=$(apt-cache policy "$1" | grep Candidate | cut -d: -f 2 | tr -d "[:blank:]")
+		# source package name might not have any installable candidates, so check the candidate version via one of the provided packages
+		candidate=""
+		for p in $(apt-cache showsrc "$1" | grep Binary | sed 's/Binary: //' | tr -d "," | tr '[:blank:]' '\n' | sort | uniq); do
+			if candidate=$(apt-cache policy "$p"); then
+				candidate=$(apt-cache policy "$p" | grep Candidate | cut -d: -f 2- | tr -d "[:blank:]")
+				break
+			fi
+		done
+		if [[ "$candidate" = "" ]]; then
+			echo "cannot determine candidate version"
+			exit 1
+		fi
 		pkg="${1}=${candidate}"
 	fi
 
