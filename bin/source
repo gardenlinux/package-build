@@ -49,7 +49,7 @@ apt_src() (
 		candidate=""
 		for p in $(apt-cache showsrc "$1" | grep Binary | sed 's/Binary: //' | tr -d "," | tr '[:blank:]' '\n' | sort | uniq); do
 			if candidate=$(apt-cache policy "$p"); then
-				candidate=$(apt-cache policy "$p" | grep Candidate | cut -d: -f 2- | tr -d "[:blank:]")
+				candidate=$(apt-cache policy "$p" | grep Candidate | cut -d: -f 2- | tr -d "[:blank:]" | sed 's/+b[0-9]\+$//')
 				break
 			fi
 		done
