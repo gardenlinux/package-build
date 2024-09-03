@@ -60,6 +60,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: source
+          include-hidden-files: true
           path: |
             .
             !.git
@@ -133,6 +134,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: binary-${{ matrix.arch }}
+          include-hidden-files: true
           path: .build
   release:
     runs-on: ubuntu-latest
