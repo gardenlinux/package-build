@@ -47,7 +47,7 @@ apt_src() (
 	else
 		# source package name might not have any installable candidates, so check the candidate version via one of the provided packages
 		candidate=""
-		for p in $(apt-cache showsrc "$1" | grep Binary | sed 's/Binary: //' | tr -d "," | tr '[:blank:]' '\n' | sort | uniq); do
+		for p in $(apt-cache showsrc "$1" | grep Binary | sed 's/Binary: //' | tr -d "," | tr '[:blank:]' '\n' | sort | uniq | grep -v -- -udeb); do
 			if candidate=$(apt-cache policy "$p"); then
 				candidate=$(apt-cache policy "$p" | grep Candidate | cut -d: -f 2- | tr -d "[:blank:]" | sed 's/+b[0-9]\+$//')
 				break
