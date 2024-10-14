@@ -88,3 +88,18 @@ To create a patch release for this version:
    git push origin <VERSION>
    ```
    If the action is setup to run on `push`, as in the example above, this will trigger the build job to run which detects that this is a new version and thus causes it to be released, setting up the necessary tags and GitHub releases.
+
+#### Example: backport new upstream version not (yet) available on salsa
+
+If we want to, for example, backport openssl 3.1.7 but this version does not exist in debian salsa step 3 of the above instructions would be to set the `prepare_source` script to
+
+```
+version_orig=3.1.7
+version="$version_orig-0"
+git_src --branch "openssl-$version_orig" https://github.com/openssl/openssl.git
+apt_src --ignore-orig openssl
+version_suffix=gl0~bp1443
+```
+
+This will cause the package build to fetch all actual source file from the upstream openssl repo on github.com, while taking the debian folder from the apt source package.
+In the case that there are compatibility issues between the apt source debian folder and the new upstream source some patches might need to be added (see the apply_patches function in the source script).
