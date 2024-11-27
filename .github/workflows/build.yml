@@ -117,6 +117,17 @@ jobs:
           while read repo tag; do
             if [ -n "$repo" ] && [ -n "$tag" ]; then
               gh release download --dir build_dep --repo "$repo" "$tag"
+              if [ -e build_dep/build.tar.xz.0000 ]; then
+                cat build_dep/build.tar.xz.* | xz -d | tar -C build_dep -x
+                rm build_dep/build.tar.xz.*
+              fi
+              if [ -e build_dep/build.tar.xz ]; then
+                xz -d < build_dep/build.tar.xz | tar -C build_dep -x
+                rm build_dep/build.tar.xz
+              fi
+              if [ -e build_dep/null ]; then
+                rm build_dep/null
+              fi
             fi
           done <<< "$(cat << 'EOF'
           ${{ inputs.build_dep }}
