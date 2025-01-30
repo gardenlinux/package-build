@@ -168,14 +168,15 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -x
           ls -lah .build
           RELEASE_NOTES=$(mktemp)
           echo "created by GitHub actions run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" > $RELEASE_NOTES
           echo "" >> $RELEASE_NOTES
           echo "Files in this release:" >> $RELEASE_NOTES
-          echo "```" >> $RELEASE_NOTES
+          echo '```' >> $RELEASE_NOTES
           find .build -type f -exec basename {} \; | sort >> $RELEASE_NOTES
-          echo "```" >> $RELEASE_NOTES
+          echo '```' >> $RELEASE_NOTES
 
           pkg="${{ needs.source.outputs.pkg }}"
           version="${{ needs.source.outputs.version }}"
