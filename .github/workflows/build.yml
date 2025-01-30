@@ -169,7 +169,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ls -lah .build
+          RELEASE_NOTES=$(mktemp)
+          echo "created by GitHub actions run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" > $RELEASE_NOTES
+          echo "" >> $RELEASE_NOTES
+          echo "Files in this release:" >> $RELEASE_NOTES
+          echo '```' >> $RELEASE_NOTES
+          find .build -type f -exec basename {} \; | sort >> $RELEASE_NOTES
+          echo '```' >> $RELEASE_NOTES
+
           pkg="${{ needs.source.outputs.pkg }}"
           version="${{ needs.source.outputs.version }}"
           tar -C .build -cv . | xz | split --bytes=1G --suffix-length=4 --numeric-suffix - build.tar.xz.
-          gh release create "$version" --latest=${{ inputs.latest }} --verify-tag --title "${pkg}_${version}" --notes "created by GitHub actions run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" build.tar.xz.*
+          gh release create "$version" --latest=${{ inputs.latest }} --verify-tag --title "${pkg}_${version}" --notes-file $RELEASE_NOTES build.tar.xz.*
