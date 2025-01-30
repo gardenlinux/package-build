@@ -168,7 +168,6 @@ jobs:
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          set -x
           ls -lah .build
           RELEASE_NOTES=$(mktemp)
           echo "created by GitHub actions run [${{ github.run_id }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" > $RELEASE_NOTES
