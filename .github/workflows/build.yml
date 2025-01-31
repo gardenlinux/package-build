@@ -174,7 +174,9 @@ jobs:
           echo "" >> $RELEASE_NOTES
           echo "Files in this release:" >> $RELEASE_NOTES
           echo '```' >> $RELEASE_NOTES
-          find .build -type f -exec basename {} \; | sort >> $RELEASE_NOTES
+          pushd .build
+          find . -type f -exec sha256sum {} \; >> $RELEASE_NOTES
+          popd
           echo '```' >> $RELEASE_NOTES
 
           pkg="${{ needs.source.outputs.pkg }}"
