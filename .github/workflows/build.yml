@@ -15,10 +15,10 @@ on:
         default: ubuntu-latest
       runs-on-amd64:
         type: string
-        default: ubuntu-latest
+        default: ubuntu-24.04
       runs-on-arm64:
         type: string
-        default: ubuntu-latest-arm
+        default: ubuntu-24.04-arm
       force-arm-build:
         type: boolean
         default: false
