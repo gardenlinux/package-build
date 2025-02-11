@@ -68,12 +68,7 @@ if [ -n "$build_dep_dir" ]; then
 fi
 
 if [ -z "$skip_source" ]; then
-  if [ -z "$gl_package_build_debug" ]; then
-	  podman run --security-opt seccomp=unconfined --arch "$arch" --rm "${mount_opts[@]}" -w "/opt/package_build/workdir" "$container" /opt/package_build/bin/source
-  else
-    echo "Starting package build container without --rm"
-	  podman run --security-opt seccomp=unconfined --arch "$arch" "${mount_opts[@]}" -w "/opt/package_build/workdir" -e gl_package_build_debug=true "$container" /opt/package_build/bin/source
-  fi
+  podman run --security-opt seccomp=unconfined --arch "$arch" --rm "${mount_opts[@]}" -w "/opt/package_build/workdir" -e gl_package_build_debug="$gl_package_build_debug" "$container" /opt/package_build/bin/source
 fi
 if [ -z "$skip_binary" ]; then
 	podman run --security-opt seccomp=unconfined --arch "$arch" --rm "${mount_opts[@]}" -w "/opt/package_build/workdir" "$container" /opt/package_build/bin/binary "$build"

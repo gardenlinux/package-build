@@ -26,6 +26,21 @@ The `build` script takes arguments which may be used to customize the build.
    - Choices: `amd64` (default), `arm64` 
 - `--source-only`: Only build source archive
 - `--binary-only`: Only build the binary archives
+- `--debug`: keeps sources of source step inside an output folder. Used to prepare sources for manual patching.  
+
+
+### Manual patching
+
+Prepare your local sources
+```
+./package-build/build --debug --source-only package-iproute2
+```
+This step has created an `output` folder inside package-iproute2. 
+The `output` folder contains the source in the state left by `package-build/bin/source`.
+
+![NOTE]
+> If the package-build/bin/source failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
+
 
 ## GitHub action build
 
@@ -103,3 +118,6 @@ version_suffix=gl0~bp1443
 
 This will cause the package build to fetch all actual source file from the upstream openssl repo on github.com, while taking the debian folder from the apt source package.
 In the case that there are compatibility issues between the apt source debian folder and the new upstream source some patches might need to be added (see the apply_patches function in the source script).
+
+##
+

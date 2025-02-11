@@ -125,13 +125,14 @@ version=
 version_suffix=gl~dev
 
 
-dir="$(mktemp -d)"
 if [ -z "${gl_package_build_debug+x}" ]; then
+  dir="$(mktemp -d)"
   trap 'cd / && rm -rf "$dir"' EXIT
 else
-  trap 'echo $dir' EXIT
-  echo "Package sources are located in:"
-  echo "\t$dir"
+  trap 'echo $dir' exit
+  mkdir -p output
+  dir="./output"
+  echo "Keeping source files in output folder of $pkg"
 fi
 
 mkdir "$dir/src"
@@ -166,7 +167,9 @@ chown -R user:users "$dir"
 	cd "$dir/src"
 	su -s /bin/sh -c 'dpkg-source --build .' user
 )
-rm -rf "$dir/src"
+if [ -z "${gl_package_build_debug+x}" ]; then
+  rm -rf "$dir/src"
+fi
 
 mkdir -p .build
 cp -r "$dir/." .build/.
