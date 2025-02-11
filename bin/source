@@ -132,7 +132,7 @@ else
   trap 'echo $dir' exit
   mkdir -p output
   dir="./output"
-  echo "Keeping source files in output folder of $pkg"
+  echo "Keeping source files in output folder"
 fi
 
 mkdir "$dir/src"
