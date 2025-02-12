@@ -37,12 +37,12 @@ We will use package-linux as an example.
 ./package-build/build --debug --source-only package-linux
 ```
 
-![NOTE]
+> ![NOTE]
 > If you run this on arm64, then you need to also pass `--arch arm64` for the source build. Cross-build for generating sources is not required and might cause issues.
 
 
-![NOTE]
-> If the package-build/bin/source failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
+> ![NOTE]
+> If the package-build/bin/source has failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
 
 This will invoke the package-build/bin/source step inside a container, and after the source script is done (either successfully, or exited with errore) 
 the sources are placed inside `package-linux/output/run-<date-time>/a`. An additional copy `package-linux/output/run-<date-time>/b` is automatically made, so we can edit inside b folder and do a diff between a and b as described later.
