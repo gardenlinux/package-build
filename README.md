@@ -32,20 +32,23 @@ The `build` script takes arguments which may be used to customize the build.
 In the following we will go through one way of creating a patch for a gardenlinux package. 
 We will use package-linux as an example.
 
-
-1. Prepare your local sources
+#### 1. Prepare your local sources
 ```
 ./package-build/build --debug --source-only package-linux
 ```
-This will invoke the package-build/bin/source step inside a container, and keeps the sources folder in package-linux/output once the source step is done.
-That means we can use the sources inside the package-linux/output/src folder as a starting point to create or fix a patch. 
 
 ![NOTE]
 > If you run this on arm64, then you need to also pass `--arch arm64` for the source build. Cross-build for generating sources is not required and might cause issues.
 
 
+![NOTE]
+> If the package-build/bin/source failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
 
-2. (optional) Spawn a temporary linux container to use quilt 
+This will invoke the package-build/bin/source step inside a container, and after the source script is done (either successfully, or exited with errore) 
+the sources are placed inside `package-linux/output/run-<date-time>/a`. An additional copy `package-linux/output/run-<date-time>/b` is automatically made, so we can edit inside b folder and do a diff between a and b as described later.
+
+
+#### 2. (optional) Spawn a temporary linux container to use quilt 
 
 
 ```
@@ -54,14 +57,27 @@ That means we can use the sources inside the package-linux/output/src folder as 
 This starts a debian container with the output folder generated from the previous step mounted.
 You need to cd into the correct run_<date> folder, which was created by step 1. 
 
-3. Use quilt to fix patch 
+#### 3. Make your changes inside folder b 
+
+```
+# please make sure to select the correct run-date folder
+cd package-linux/output/run-<date>/b
+```
+
+You can directly edit the source files, or use quilt to fix/refresh existing patches. 
 
 
+#### 4. Create the patch 
+
+The diff between folder a and your edited folder b is now the patch. We just need to create it in an acceptable format:
+
+```
+diff -Naur a/ b/ > name-of-your-patch.patch 
+```
+
+Add your `name-of-your-patch.patch` to the packages-linux/patches folder and append the name of the patch to the `package-linux/patches/series` file. 
 
 
-
-![NOTE]
-> If the package-build/bin/source failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
 
 
 ## GitHub action build

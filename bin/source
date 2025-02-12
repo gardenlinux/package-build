@@ -176,7 +176,6 @@ chown -R user:users "$dir"
 )
 if [ -z "${gl_package_build_debug+x}" ]; then
   rm -rf "$dir/src"
-else
 fi
 
 mkdir -p .build
