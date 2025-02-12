@@ -125,14 +125,12 @@ version=
 version_suffix=gl~dev
 
 
+dir="$(mktemp -d)"
+output="$(pwd)/output"
 if [ -z "${gl_package_build_debug+x}" ]; then
-  dir="$(mktemp -d)"
   trap 'cd / && rm -rf "$dir"' EXIT
 else
-  trap 'echo $dir' exit
-  mkdir -p output
-  dir="./output"
-  echo "Keeping source files in output folder"
+  trap 'cd / && cp -r "$dir/." $output' EXIT
 fi
 
 mkdir "$dir/src"
@@ -173,3 +171,4 @@ fi
 
 mkdir -p .build
 cp -r "$dir/." .build/.
+
