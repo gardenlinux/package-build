@@ -27,7 +27,6 @@ The `build` script takes arguments which may be used to customize the build.
 - `--source-only`: Only build source archive
 - `--binary-only`: Only build the binary archives
 - `--debug`: keeps sources of source step inside an output folder. Used to prepare sources for manual patching.  
-
 ### Create/Fix Patches
 
 In the following we will go through one way of creating a patch for a gardenlinux package. 
@@ -44,7 +43,22 @@ That means we can use the sources inside the package-linux/output/src folder as 
 ![NOTE]
 > If you run this on arm64, then you need to also pass `--arch arm64` for the source build. Cross-build for generating sources is not required and might cause issues.
 
-2. Fix a Patch
+
+
+2. (optional) Spawn a temporary linux container to use quilt 
+
+
+```
+./package-build/build --edit package-linux
+```
+This starts a debian container with the output folder generated from the previous step mounted.
+You need to cd into the correct run_<date> folder, which was created by step 1. 
+
+3. Use quilt to fix patch 
+
+
+
+
 
 ![NOTE]
 > If the package-build/bin/source failed, the sources are kept and are in the state where the package-build/bin/sources exited. 

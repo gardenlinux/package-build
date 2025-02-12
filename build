@@ -73,7 +73,7 @@ if [ -n "$build_dep_dir" ]; then
 fi
 
 if [ -n "$edit" ]; then
-  podman run --security-opt seccomp=unconfined --arch "$arch" -ti --rm "${mount_opts[@]}" -w "/opt/package_build/workdir/output" -e gl_package_build_debug="$gl_package_build_debug" "$container" /bin/bash
+  podman run --security-opt seccomp=unconfined --arch "$arch" -ti --rm "${mount_opts[@]}" -w "/opt/package_build/workdir/output" -e gl_package_build_debug="$gl_package_build_debug" "$container" /opt/package_build/bin/patchenv-init
   exit $?
 fi
 

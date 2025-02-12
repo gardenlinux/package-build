@@ -130,7 +130,8 @@ output="$(pwd)/output"
 if [ -z "${gl_package_build_debug+x}" ]; then
   trap 'cd / && rm -rf "$dir"' EXIT
 else
-  trap 'cd / && ls $output && mv "$dir" $output/run_$(date +"%d-%m-%Y_%H:%M")' EXIT
+  output_run_dir="$output/run_$(date +"%d-%m-%Y_%H:%M")"
+  trap 'cd / && mv "$dir" $output_run_dir && cp -r $output_run_dir/a $output_run_dir/b ' EXIT
 fi
 
 mkdir "$dir/src"
@@ -167,6 +168,8 @@ chown -R user:users "$dir"
 )
 if [ -z "${gl_package_build_debug+x}" ]; then
   rm -rf "$dir/src"
+else
+  mv $dir/src $dir/a
 fi
 
 mkdir -p .build
