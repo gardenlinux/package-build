@@ -33,29 +33,29 @@ In the following we will go through one way of creating a patch for a gardenlinu
 We will use package-linux as an example.
 
 #### 1. Prepare your local sources
+
+This will invoke the [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) step inside a container, and after the source script is done (either successfully, or exited with an error) 
+the sources are placed inside `package-linux/output/run-<date-time>/a`, and another copy `package-linux/output/run-<date-time>/b` right next to it.
+
 ```
 ./package-build/build --debug --source-only package-linux
 ```
 
-> ![NOTE]
+> [!Warning]
 > If you run this on arm64, then you need to also pass `--arch arm64` for the source build. Cross-build for generating sources is not required and might cause issues.
 
-
-> ![NOTE]
+> [!Note]
 > If the package-build/bin/source has failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
 
-This will invoke the package-build/bin/source step inside a container, and after the source script is done (either successfully, or exited with errore) 
-the sources are placed inside `package-linux/output/run-<date-time>/a`. An additional copy `package-linux/output/run-<date-time>/b` is automatically made, so we can edit inside b folder and do a diff between a and b as described later.
+#### 2. Spawn a temporary linux container to use quilt 
 
-
-#### 2. (optional) Spawn a temporary linux container to use quilt 
-
+This starts a debian container with the output folder generated from the previous step mounted. 
 
 ```
 ./package-build/build --edit package-linux
 ```
-This starts a debian container with the output folder generated from the previous step mounted.
-You need to cd into the correct run_<date> folder, which was created by step 1. 
+Preparations are defined in [package-build/bin/patchenv-init](https://github.com/gardenlinux/package-build/blob/main/bin/patchenv-init),
+you can review those and use your local machine instead. 
 
 #### 3. Make your changes inside folder b 
 
@@ -66,6 +66,23 @@ cd package-linux/output/run-<date>/b
 
 You can directly edit the source files, or use quilt to fix/refresh existing patches. 
 
+To just refresh a patch you would do the following as an example:
+```
+cd b
+quilt push -a
+
+# you see that a patch failed now
+
+quilt push -f
+quilt refresh
+
+# if quilt was able to refresh the patch automatically, the following cmd will continue with the rest of the patches
+quilt push -a
+
+# If you encounter another failing patch, it is recommended to first continue with step 4. to save the fix we did above with quilt refresh
+
+```
+
 
 #### 4. Create the patch 
 
@@ -75,9 +92,23 @@ The diff between folder a and your edited folder b is now the patch. We just nee
 diff -Naur a/ b/ > name-of-your-patch.patch 
 ```
 
-Add your `name-of-your-patch.patch` to the packages-linux/patches folder and append the name of the patch to the `package-linux/patches/series` file. 
+> [!Tip]
+> If you already know what file has changed, e.g. because you fix a debian/patch/file, then you can instead use
+> ```
+> diff -Naur a/path/to/file b/path/to/file > name-of-your-patch.patch 
+> ```
 
+#### 5. Append the patch to the patches folder
 
+Depending on the package you are working with, there may or may not already exists an appropriate patches folder where you can add the `name-of-your-patch.patch` to.
+
+If it does not exist yet, you need to create a folder (e.g. called `fixes_debian`) and then adapt the prepare_source script to apply patches by adding for example this line
+```
+apply_patches fixes_debian
+```
+
+apply_patches is a bash function sourced from [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) and applies all patches as defined by the series file. 
+See example [package-linux](https://github.com/gardenlinux/package-linux/blob/18baefb947b6fb3a4abaa9c58b6a42be3117e6dd/prepare_source#L30C1-L30C27)
 
 
 ## GitHub action build
