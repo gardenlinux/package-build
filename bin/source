@@ -130,7 +130,7 @@ output="$(pwd)/output"
 if [ -z "${gl_package_build_debug+x}" ]; then
   trap 'cd / && rm -rf "$dir"' EXIT
 else
-  trap 'cd / && cp -r "$dir/." $output' EXIT
+  trap 'cd / && ls $output && mv "$dir" $output/run_$(date +"%d-%m-%Y_%H:%M")' EXIT
 fi
 
 mkdir "$dir/src"
