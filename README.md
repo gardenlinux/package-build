@@ -28,15 +28,23 @@ The `build` script takes arguments which may be used to customize the build.
 - `--binary-only`: Only build the binary archives
 - `--debug`: keeps sources of source step inside an output folder. Used to prepare sources for manual patching.  
 
+### Create/Fix Patches
 
-### Manual patching
+In the following we will go through one way of creating a patch for a gardenlinux package. 
+We will use package-linux as an example.
 
-Prepare your local sources
+
+1. Prepare your local sources
 ```
-./package-build/build --debug --source-only package-iproute2
+./package-build/build --debug --source-only package-linux
 ```
-This step has created an `output` folder inside package-iproute2. 
-The `output` folder contains the source in the state left by `package-build/bin/source`.
+This will invoke the package-build/bin/source step inside a container, and keeps the sources folder in package-linux/output once the source step is done.
+That means we can use the sources inside the package-linux/output/src folder as a starting point to create or fix a patch. 
+
+![NOTE]
+> If you run this on arm64, then you need to also pass `--arch arm64` for the source build. Cross-build for generating sources is not required and might cause issues.
+
+2. Fix a Patch
 
 ![NOTE]
 > If the package-build/bin/source failed, the sources are kept and are in the state where the package-build/bin/sources exited. 
