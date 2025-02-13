@@ -174,10 +174,14 @@ chown -R user:users "$dir"
 	cd "$dir/src"
 	su -s /bin/sh -c 'dpkg-source --build .' user
 )
+
+# all artifacts including src folder are in output/run_<data-time> folder in case of debug (see EXIT trap)
 if [ -z "${gl_package_build_debug+x}" ]; then
   rm -rf "$dir/src"
+  mkdir -p .build
+  cp -r "$dir/." .build/.
 fi
 
-mkdir -p .build
-cp -r "$dir/." .build/.
+
+
 
