@@ -26,7 +26,9 @@ The `build` script takes arguments which may be used to customize the build.
    - Choices: `amd64` (default), `arm64` 
 - `--source-only`: Only build source archive
 - `--binary-only`: Only build the binary archives
-- `--debug`: keeps sources of source step inside an output folder. Used to prepare sources for manual patching.  
+- `--debug`: creates the sources folder and keeps them in a `package-XYZ/output/run_<date_time>` folder of  local `package-XYZ` folder
+- `--edit`: spawns a gardenlinux/repo-debian-snapshort container with `package-XYZ/output` mounted, quilt installed and configured.  
+
 ### Create/Fix Patches
 
 In the following we will go through one way of creating a patch for a gardenlinux package. 
