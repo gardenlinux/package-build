@@ -34,12 +34,15 @@ We will use package-linux as an example.
 
 #### 1. Prepare your local sources
 
-This will invoke the [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) step inside a container, and after the source script is done (either successfully, or exited with an error) 
-the sources are placed inside `package-linux/output/run-<date-time>/a`, and another copy `package-linux/output/run-<date-time>/b` right next to it.
+First, we need the sources of the package-linux with all patches applied exactly as the GitHub package-build pipeline would do. 
+Later on, when we have the sources, we can fix, remove, add patches to the sources easily. 
+
 
 ```
 ./package-build/build --debug --source-only package-linux
 ```
+This step has called the [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) script inside a container, and placed the sources inside the flocal folder `package-linux/output/run-<date-time>/a`, and another copy `package-linux/output/run-<date-time>/b` right next to it. Even if the source script fails to apply a certain patch, you will have the source folders exactly in the state where the source build left bailed out. 
+
 
 > [!Warning]
 > If you run this on arm64, then you need to also pass `--arch arm64` for the source build. Cross-build for generating sources is not required and might cause issues.
@@ -49,39 +52,25 @@ the sources are placed inside `package-linux/output/run-<date-time>/a`, and anot
 
 #### 2. Spawn a temporary linux container to use quilt 
 
-This starts a debian container with the output folder generated from the previous step mounted. 
+Quilt is a versatile tool for working with patches. You can use it to fix, add or remove patches. 
+Patches inherited from debian (the patches inside the debian/patches folder that we pull) are in allmost all cases maintained with quilt.
+
+If we want to fix a patch from debian, then we need to make sure to use the same patch format as debian. Quilt can be [configured accordingly](https://wiki.debian.org/UsingQuilt#Using_quilt_with_Debian_source_packages). 
+
+The following command spawns a container with quilt already configured correctly.
+
 
 ```
 ./package-build/build --edit package-linux
 ```
+
+This starts a debian container with the output folder generated from the previous step mounted. 
+
 Preparations are defined in [package-build/bin/patchenv-init](https://github.com/gardenlinux/package-build/blob/main/bin/patchenv-init),
 you can review those and use your local machine instead. 
 
 #### 3. Make your changes inside folder b 
-
-```
-# please make sure to select the correct run-date folder
-cd package-linux/output/run-<date>/b
-```
-
-You can directly edit the source files, or use quilt to fix/refresh existing patches. 
-
-To just refresh a patch you would do the following as an example:
-```
-cd b
-quilt push -a
-
-# you see that a patch failed now
-
-quilt push -f
-quilt refresh
-
-# if quilt was able to refresh the patch automatically, the following cmd will continue with the rest of the patches
-quilt push -a
-
-# If you encounter another failing patch, it is recommended to first continue with step 4. to save the fix we did above with quilt refresh
-
-```
+Debian guide references [this](http://www.shakthimaan.com/downloads/glv/quilt-tutorial/quilt-doc.pdf) tutorial, licensed under the GNU Free Documentation License, and may be a good starting point for you. 
 
 
 #### 4. Create the patch 
