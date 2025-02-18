@@ -88,6 +88,24 @@ git_src() (
 	tar --create --directory "$tmp_dir" _ | tee "$dir/orig.tar" | tar --extract --strip-components 1 --directory "$dir/src"
 )
 
+git_src_commit() (
+	tmp_dir="$(mktemp -d)"
+	trap 'cd / && rm -rf "$tmp_dir"' EXIT
+	commit="$1"
+	repo="$2"
+
+	mkdir "$tmp_dir/src"
+	git -C "$tmp_dir/src" init
+	git -C "$tmp_dir/src" remote add origin "$repo"
+	git -C "$tmp_dir/src" fetch --depth 1 origin "$commit"
+	git -C "$tmp_dir/src" checkout FETCH_HEAD
+	git -C "$tmp_dir/src" submodule update --init --recursive --depth 1
+
+	mkdir "$tmp_dir/_"
+	git -C "$tmp_dir/src" ls-files --recurse-submodules -z | tar --directory "$tmp_dir/src" --create --null --files-from - | tar --extract --directory "$tmp_dir/_"
+	tar --create --directory "$tmp_dir" _ | tee "$dir/orig.tar" | tar --extract --strip-components 1 --directory "$dir/src"
+)
+
 import_src() (
 	cp -r "$1/." "$dir/src/."
 )
