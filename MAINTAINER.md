@@ -3,11 +3,10 @@
 
 # Naming Conventions 
 
-
 ## Repository Naming 
 
 
-Rule: 
+### Rule 1: package git repositories must be named accordingly
 ```
 package-<package-source>
 ```
@@ -16,7 +15,7 @@ package-<package-source>
    - exception: if package does not exist in debian 
 
 
-## Branch Naming
+### Rule 2: git branches of package repositories must be named accordingly 
 
 Convention: 
 - `main`: builds against latest Garden Linux environment
@@ -49,23 +48,21 @@ The debian folder contains patches, configurations and rules to make and install
 To create a Garden Linux package, we also need a **debian/ folder** including all the required files. In the following we define how we **SHOULD** get the debian folder, depending on the case:
 
 
-!RULE!
-
-If there exists a debian package, we must get the **debian/ folder** from salsa git repository, and use git tags to retrieve the corresponding version. 
+> !RULE!
+> If there exists a debian package, we must get the **debian/ folder** from salsa git repository, and use git tags to retrieve the corresponding version. 
 
 The **debian/ folder** used by debian packages are in version control and publicly accessible via the [salsa GitLab instance](https://salsa.debian.org/public) 
 
 
-!RULE! 
-
-If there does **NOT** exist a debian package, we must define the **debian/ folder** ourself and check it in our `package-` repository. 
+> !RULE! 
+> If there does **NOT** exist a debian package, we must define the **debian/ folder** ourself and check it in our `package-` repository. 
 
 
 
 ### Get upstream source  
 
-!RULE! 
-If available, get source from upstream git repository. 
+> !RULE! 
+> If available, get source from upstream git repository. 
 
 We **MUST** watch upstream git repository automatically, and automatically trigger pipelines to build and test new upstream versions without waiting for a debian maintainer to upgrade salsa. 
 
@@ -79,16 +76,16 @@ For that, we use a scan tooling based on debian's uscan. Rules for this tool are
 Garden Linux Patches are applied on top of debian patches. 
 
 
-!RULE! 
-
+**RULE 1.1
 Patching the patches. We consider the debian/patches folder as source, and changes wen make to debian/patches are done and tracked via patches. 
 
 :> [!WARNING]
 > please see patching guide --- insert link here --- 
 
 !RULE! 
-
+``` 
 Upstream patches are appended to debian/patches/series and patched into debian/patches folder. 
+```
 
 
 # Make source package 
