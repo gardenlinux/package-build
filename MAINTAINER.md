@@ -1,7 +1,7 @@
 # Maintainer Guide 
 
 This guide is written for Garden Linux maintainers, explaining the steps required for creating a package for Garden Linux.
-Along the series of steps, we will introduce rules in the correct context, which are outlined in the chapter [Overview of Rules](#overview-of-rules).
+Along the series of steps, we will introduce rules in the correct context, which are outlined in the table presented in the [Overview of Rules](#overview-of-rules).
 
 > [!NOTE]
 > The overall Garden Linux release process is described in a Garden Linux Maintainer internal document [here](https://github.com/gardenlinux/process/blob/main/release.md).
@@ -20,18 +20,29 @@ Along the series of steps, we will introduce rules in the correct context, which
 | [Rule 8](#rule-8-append-to-debian-patches) | Append to debian patches        |
 
 
-# Create a new package git repository
+# Use Cases 
 
+
+| Use Case                           | Description                                      |
+|-------------------------------------|------------------------------------------------|
+| [Use Case 1](#use-case-1-build-package-with-garden-linux-pipelines) | Build package with Garden Linux pipelines       |
+| [Use Case 2](#use-case-2-build-backport-package-with-garden-linux-pipelines) | Build Backport package with Garden Linux pipelines |
+| [Use Case 3](#use-case-3-create-build-dependency-package-with-garden-linux-pipelines) | Create build dependency package with Garden Linux pipelines |
+| [Use Case 4](#use-case-4-local-builds) | Local builds                                    |
+
+## Use Case 1: Build package with Garden Linux pipelines
+How to do a regular package build is described [here](https://github.com/gardenlinux/package-build/blob/main/README.md#github-action-build).
 
 #### Rule 1: Package git repositories must be named accordingly
 ```
 package-<package-source>
 ```
-- must start with package- 
+- must start with `package-` 
 - `<package-source>` must be the name of the source package as it is defined in debian
    - exception: if package does not exist in debian 
 
-# Create a backport branch for a package git repository
+## Use Case 2: Build Backport package with Garden Linux pipelines
+How to do a backport package build is described [here](https://github.com/gardenlinux/package-build/blob/main/README.md#patch-releases--backporting).
 
 #### Rule 2: Git branches of package repositories must be named accordingly
 
@@ -40,7 +51,7 @@ Branch types:
 - `rel-<MAJOR>`: builds against `<MAJOR>` version of Garden Linux. 
 - `fix/*`, `feat/*`, `other/*`: are allowed to indicate that the branch is not used for   
 
-# Create a one-shot build-dependency git repository 
+## Use Case 3: Create build dependency package with Garden Linux pipelines
 
 In the case when a package `ABC` requires a build dependency `XYZ` in a certain version or with a certain patch applied, we use the bp-package repositories,
 which are one-shot build dependency packages. 
@@ -62,11 +73,16 @@ jobs:
 ```
 
 #### Rule 3: One-shot build dependency repositories must start with bp-package
-
 Package repositories only required as a dependency for a backported package must start with bp-package-*.
 
+## Use Case 4: Local builds
+Building packages locally is explained [here](https://github.com/gardenlinux/package-build/blob/main/README.md#local-package-build), no rules apply.
+ 
 
 # Package build process 
+
+The package build process is described in further detail in this chapter in addition to the short guide in the [README.md](https://github.com/gardenlinux/package-build/blob/main/README.md).
+
 
 Overview of steps to make a package for Garden Linux:
 ```
