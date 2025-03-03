@@ -20,9 +20,7 @@ Along the series of steps, we will introduce rules in the correct context, which
 | [Rule 8](#rule-8-append-to-debian-patches) | Append to debian patches        |
 
 
-# Git Repository conventions
-
-## Repository Naming 
+# Create a new package git repository
 
 
 #### Rule 1: Package git repositories must be named accordingly
@@ -30,23 +28,43 @@ Along the series of steps, we will introduce rules in the correct context, which
 package-<package-source>
 ```
 - must start with package- 
-- <package-source> must be the name of the source package as it is defined in debian
+- `<package-source>` must be the name of the source package as it is defined in debian
    - exception: if package does not exist in debian 
 
+# Create a backport branch for a package git repository
 
 #### Rule 2: Git branches of package repositories must be named accordingly
 
-Convention: 
+Branch types: 
 - `main`: builds against latest Garden Linux environment
 - `rel-<MAJOR>`: builds against `<MAJOR>` version of Garden Linux. 
 - `fix/*`, `feat/*`, `other/*`: are allowed to indicate that the branch is not used for   
 
+# Create a one-shot build-dependency git repository 
 
-#### Rule 3: One-shot backport repositories must start with bp-package
+In the case when a package `ABC` requires a build dependency `XYZ` in a certain version or with a certain patch applied, we use the bp-package repositories,
+which are one-shot build dependency packages. 
+
+Those packages are NOT included in the package-releases file of gardenlinux/repo, but they are included in the package build of `ABC` with the [build_dep](https://github.com/gardenlinux/package-build/blob/290959d6fc5ba4f8c378ef931f66e7bed2b134b4/.github/workflows/build.yml#L10) argument like this:
+
+```
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+jobs:
+  build:
+    uses: gardenlinux/package-build/.github/workflows/build.yml@main
+    with:
+      release: ${{ github.ref == 'refs/heads/main' }}
+      build_dep: gardenlinux/package-XYZ 0.0.1-0gl0+bpwhatever
+```
+
+#### Rule 3: One-shot build dependency repositories must start with bp-package
 
 Package repositories only required as a dependency for a backported package must start with bp-package-*.
 
-Please note that the bp-package-* is only included in the targeted package-*  backport.
 
 # Package build process 
 
@@ -88,7 +106,8 @@ If there does **NOT** exist a debian package, we must define the **debian/ folde
 
 We **MUST** watch upstream git repository automatically, and automatically trigger pipelines to build and test new upstream versions without waiting for a debian maintainer to upgrade salsa. 
 For that, we use a scan tooling based on debian's uscan. Rules for this tool are defined per package in `debian/watch`, and include what target upstream repo to watch, and what to watch including what semversion changes should be pulled (e.g. only patchlevel).
-:> [!WARNING]
+
+> [!WARNING]
 > Guide on how to define these `debian/watch` rules is to be done!
 
 #### Rule 6: Get upstream source from upstream git
@@ -99,7 +118,7 @@ This means do NOT use apt source packages, do NOT use patches to update to a ver
 
 Garden Linux Patches are applied on top of debian patches. 
 
-:> [!WARNING]
+> [!WARNING]
 > please see patching guide --- insert link here --- 
 
 #### Rule 7: Patching the patches 
