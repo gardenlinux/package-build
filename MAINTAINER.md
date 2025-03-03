@@ -1,10 +1,13 @@
 # Maintainer Guide 
 
-This guide is written for Garden Linux maintainers, explaining with context the steps required for creating a package for Garden Linux. 
+This guide is written for Garden Linux maintainers, explaining the steps required for creating a package for Garden Linux.
+Along the series of steps, we will introduce rules in the correct context, which are outlined in the chapter [Overview of Rules](#overview-of-rules).
+
+> [!NOTE]
+> The overall Garden Linux release process is described in a Garden Linux Maintainer internal document [here](https://github.com/gardenlinux/process/blob/main/release.md).
 
 
-
-## Overview
+## Overview of Rules
 | Rule Number | Description                                             |
 |-------------|-------------------------------------------------------|
 | [Rule 1](#rule-1-package-git-repositories-must-be-named-accordingly) | Package git repositories must be named accordingly     |
