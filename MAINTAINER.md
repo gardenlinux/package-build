@@ -22,7 +22,7 @@ This guide is written for Garden Linux maintainers, explaining with context the 
 ## Repository Naming 
 
 
-### Rule 1: Package git repositories must be named accordingly
+#### Rule 1: Package git repositories must be named accordingly
 ```
 package-<package-source>
 ```
@@ -31,7 +31,7 @@ package-<package-source>
    - exception: if package does not exist in debian 
 
 
-### Rule 2: Git branches of package repositories must be named accordingly
+#### Rule 2: Git branches of package repositories must be named accordingly
 
 Convention: 
 - `main`: builds against latest Garden Linux environment
@@ -39,7 +39,7 @@ Convention:
 - `fix/*`, `feat/*`, `other/*`: are allowed to indicate that the branch is not used for   
 
 
-### Rule 3: One-shot backport repositories must start with bp-package
+#### Rule 3: One-shot backport repositories must start with bp-package
 
 Package repositories only required as a dependency for a backported package must start with bp-package-*.
 
@@ -76,7 +76,7 @@ If there exists a debian package, we must get the **debian/ folder** from salsa 
 The **debian/ folder** used by debian packages are in version control and publicly accessible via the [salsa GitLab instance](https://salsa.debian.org/public) 
 
 
-## Rule 5: Create `debian/` folder in package repo only if Debian package does not exist
+#### Rule 5: Create `debian/` folder in package repo only if Debian package does not exist
 
 If there does **NOT** exist a debian package, we must define the **debian/ folder** ourself and check it in our `package-` repository. 
 
@@ -88,7 +88,7 @@ For that, we use a scan tooling based on debian's uscan. Rules for this tool are
 :> [!WARNING]
 > Guide on how to define these `debian/watch` rules is to be done!
 
-## Rule 6: Get upstream source from upstream git
+#### Rule 6: Get upstream source from upstream git
 To enable automatic upstream version tracking, get source from upstream git repository. 
 This means do NOT use apt source packages, do NOT use patches to update to a version.
 
