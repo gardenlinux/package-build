@@ -108,12 +108,17 @@ The debian folder contains patches, configurations and rules to make and install
 To create a Garden Linux package, we also need a **debian/ folder** including all the required files. In the following we define how we **SHOULD** get the debian folder, depending on the case:
 
 
-#### Rule 4: Get source from salsa
-If there exists a debian package, we must get the **debian/ folder** from salsa git repository, and use git tags to retrieve the corresponding version. 
-The **debian/ folder** used by debian packages are in version control and publicly accessible via the [salsa GitLab instance](https://salsa.debian.org/public) 
+#### Rule 4: For existing debian packages, get debian folder from Garden Linux snapshot apt repo
+Get debian/ Folder from those snapshots, as described below
 
+The helper script [apt_src](https://github.com/gardenlinux/package-build/blob/621c4c8f530a93884f7b9a4dfc348a50a2d19aa5/bin/source#L31C1-L31C8) must be used in prepare_source like this:
+```
+apt_src --ignore_orig <source_package_name> 
+```
+> [!NOTE]
+> All Debian packages from testing are mirrored daily in a Garden Linux snapshot apt repository, if a source package is missing in a snapshot, salsa may be used to get a debian/ folder. 
 
-#### Rule 5: Create `debian/` folder in package repo only if Debian package does not exist
+#### Rule 5: For packages not existing in debian at all, create `debian/` folder in package- git repo
 
 If there does **NOT** exist a debian package, we must define the **debian/ folder** ourself and check it in our `package-` repository. 
 
@@ -138,12 +143,15 @@ Garden Linux Patches are applied on top of debian patches.
 > please see patching guide --- insert link here --- 
 
 #### Rule 7: Patching the patches 
-Patching the patches. We consider the debian/patches folder as source, and changes wen make to debian/patches are done and tracked via patches. 
+We consider the debian/patches folder as source, and changes to debian/patches are done and tracked via patches. 
 
 
 #### Rule 8: Append to `debian/patches`
-Upstream patches are appended to debian/patches/series and patched as new files into the debian/patches folder. 
+Patches for upstream source are put in folder `upstream_patches` and applied with helper function [import_upstream_patches](https://github.com/gardenlinux/package-build/blob/621c4c8f530a93884f7b9a4dfc348a50a2d19aa5/bin/source#L122)
+This helper function copies the patches to debian/patches and appends them to debian/patches/series 
 
+> [!NOTE]
+> This allows us to conviniently import and maintain patches from upstream (e.g. cherry-pick an upstream commit on a different branch that fixes a CVE).
 
 # Make source package 
 A source package contains all the necessary files to build the binaries, and will be used as input by the next step [Make binary package](##Make-binary-package). 
