@@ -12,7 +12,7 @@ Along the series of steps, we will introduce rules in the correct context, which
 |-------------|-------------------------------------------------------|
 | [Rule 1](#rule-1-package-git-repositories-must-be-named-accordingly) | Package git repositories must be named accordingly     |
 | [Rule 2](#rule-2-git-branches-of-package-repositories-must-be-named-accordingly) | Git branches of package repositories must be named accordingly |
-| [Rule 3](#rule-3-one---shot-build-dependency-repositories-must-start-with-bp---package) | One-shot backport repositories must start with bp-package |
+| [Rule 3](#rule-3-one-shot-build-dependency-repositories-must-start-with-bp-package) | One-shot backport repositories must start with bp-package |
 | [Rule 4](#rule-4-get-source-from-salsa) | Get source from salsa                                    |
 | [Rule 5](#rule-5-create-debian-folder-in-package-repo-only-if-debian-package-does-not-exist) | Create `debian/` folder in package repo only if Debian package does not exist |
 | [Rule 6](#rule-6-get-upstream-source-from-upstream-git) | Get upstream source from upstream git                   |
