@@ -169,26 +169,48 @@ The central gardenlinux/package-build repo contains reusable actions, that are u
 
 # Test binary package 
 
-TBD
+
+Tests are currently disabled by default via the `nocheck` debian build profile.
+
+From [Debian wiki](https://wiki.debian.org/BuildProfileSpec#The_DEB_BUILD_PROFILES_environment_variable)
+> nocheck: No test suite should be run, and build dependencies used only for that purpose should be ignored. Builds that set this profile must also add nocheck to DEB_BUILD_OPTIONS
+
 
 # Handover to repo build 
+The gardenlinux/repo is responsible for pulling all required packages and create the apt repositories.  
+Packages are either collected from a debian mirror, or from the respective GitHub release page in case we build the package with Garden Linux package-build pipelines.
 
 ## Daily release 
-Packages are uploaded to GitHub Release Page. A daily scheduled gardenlinux/repo action collects all latest releases and creates a new apt repository based on latest packages. 
+A daily scheduled gardenlinux/repo action collects all latest releases and creates a new apt repository based on latest packages. 
+
+1. Get list of `gardenlinux/package-*` repositories
+2. Download each package/version from GitHub Releases of respective package-* git repo.
+
 
 ## Patch release 
 Packages for patch releases are also uploaded to the GitHub Release page, but must be manually selected in the gardenlinux/repo to be included for a certain patch release apt repository.  
 
+## Disable a package-XYZ repository (NULL release handling)
+If a package-XYZ build must be excluded in next nightly apt repositories, a so called "NULL release" must be published for package-XYZ. 
 
-# Notes 
-- Building the package 
-   - Build environments 
-   - Backport environment 
-    - Package Backports 
-        - build environment for backports 
-            - https://github.com/gardenlinux/repo-debian-snapshot
-    - handling null releases (#2736)
-- Build Dependency Management 
-    - override build dependencies 
-    - use default build dependencies
-- Testing Packages (#2735)
+### What happens under the hood
+The [fetch_releases](https://github.com/gardenlinux/repo/blob/main/fetch_releases) script runs as part of the github actions of gardenlinux/repo. 
+`fetch_releases` goes through all repositories in gardenlinux org, and gets the latest release tag. 
+
+The [download_pkgs](https://github.com/gardenlinux/repo/blob/ce6205aabdabd8e578c963bf230aee5e91beeb5e/download_pkgs#L27) downloads all latest release files from all the package-* GitHub Releases.
+If the latest release of a given package-* contains  `null` file, it is ignored and not included in the apt repository. 
+
+### How to do a null release
+
+```
+git checkout --detach
+git commit --allow-empty -m "ignore package for repo import" 
+git tag null
+git push origin null
+echo "" > null
+gh release create null ./null --title "Null release" --notes "null"
+```
+
+
+If package-XYZ already has a null release but is not set as latest, you can set it manually as latest again to achieve the same result of gardenlinux/repo ignoring package-XYZ for next nightly apt repo.
+
