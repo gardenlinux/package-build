@@ -12,7 +12,7 @@ Later on, when we have the sources, we can fix, remove, add patches to the sourc
 ```
 ./package-build/build --debug --source-only package-linux
 ```
-This step has called the [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) script inside a container, and placed the sources inside the flocal folder `package-linux/output/run-<date-time>/a`, and another copy `package-linux/output/run-<date-time>/b` right next to it. Even if the source script fails to apply a certain patch, you will have the source folders exactly in the state where the source build left bailed out. 
+This step has called the [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) script inside a container, and placed the sources inside the local folder `package-linux/output/run-<date-time>/a`, and another copy `package-linux/output/run-<date-time>/b` right next to it. Even if the source script fails to apply a certain patch, you will have the source folders exactly in the state where the source build left bailed out. 
 
 
 > [!Warning]
