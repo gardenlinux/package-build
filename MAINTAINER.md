@@ -107,6 +107,14 @@ The debian folder contains patches, configurations and rules to make and install
 
 To create a Garden Linux package, we also need a **debian/ folder** including all the required files. In the following we define how we **SHOULD** get the debian folder, depending on the case:
 
+🏗️⚠️ This section is currently being added and reworked ⚠️🚧
+case 1: salsa maintains debian folder + a modified copy of the upstream sources
+case 2: salsa maintains only debian folder
+case 3: package does not exist in salsa
+case 4: salsa is outdated
+🏗️⚠️ This section is currently being added and reworked ⚠️🚧
+
+
 
 #### Rule 4: For existing debian packages, get debian folder from Garden Linux snapshot apt repo
 Get debian/ Folder from those snapshots, as described below
