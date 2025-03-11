@@ -67,7 +67,7 @@ If it does not exist yet, you need to create a folder (e.g. called `fixes_debian
 apply_patches fixes_debian
 ```
 
-apply_patches is a bash function sourced from [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) and applies all patches as defined by the series file. 
+apply_patches is a bash function sourced from [package-build/bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source) that applies all patches as defined by the series file. 
 See example [package-linux](https://github.com/gardenlinux/package-linux/blob/18baefb947b6fb3a4abaa9c58b6a42be3117e6dd/prepare_source#L30C1-L30C27)
 
 
