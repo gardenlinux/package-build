@@ -60,7 +60,7 @@ diff -Naur a/ b/ > name-of-your-patch.patch
 
 #### 5. Append the patch to the patches folder
 
-Depending on the package you are working with, there may or may not already exists an appropriate patches folder where you can add the `name-of-your-patch.patch` to.
+Depending on the package you are working on, there may or may not already exist an appropriate patches folder where you can add the `name-of-your-patch.patch` to.
 
 If it does not exist yet, you need to create a folder (e.g. called `fixes_debian`) and then adapt the prepare_source script to apply patches by adding for example this line
 ```
