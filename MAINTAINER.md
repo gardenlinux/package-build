@@ -49,7 +49,7 @@ How to do a backport package build is described [here](https://github.com/garden
 Branch types: 
 - `main`: builds against latest Garden Linux environment
 - `rel-<MAJOR>`: builds against `<MAJOR>` version of Garden Linux. 
-- `fix/*`, `feat/*`, `other/*`: are allowed to indicate that the branch is not used for   
+- `fix/*`, `feat/*`, `other/*`: are allowed to indicate that the branch is used temporarily for work in progress   
 
 ## Use Case 3: Create build dependency package with Garden Linux pipelines
 
