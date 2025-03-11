@@ -1,7 +1,7 @@
 # Create or fix Patches
 
 In the following we will go through one way of creating a patch for a gardenlinux package. 
-We will use package-linux as an example.
+We will use the repository package-linux and the resulting gardenlinux package "linux" as an example.
 
 #### 1. Prepare your local sources
 
