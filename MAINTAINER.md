@@ -101,11 +101,22 @@ We will walk through each step in detail below.
 The source to create a package consists of three parts. 
 The **upstream source code** + the **debian/ folder** + **Garden Linux patches**
 
+
 ### Get debian/ folder
 
 The debian folder contains patches, configurations and rules to make and install the software. For more details about the required content of that debian folder, please read [debian documentation](https://www.debian.org/doc/manuals/maint-guide/dreq.en.html).
 
 To create a Garden Linux package, we also need a **debian/ folder** including all the required files. In the following we define how we **SHOULD** get the debian folder, depending on the case:
+
+
+#### Case 1: No debian package available 
+
+In this case, we must manually maintain the **debian/ folder**.
+
+
+#### Case 2: salsa maintains only debian folder
+In this case, we can get the **debian folder** from our debian apt snapshot.
+
 
 🏗️⚠️ This section is currently being added and reworked ⚠️🚧
 
