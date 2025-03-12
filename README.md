@@ -26,7 +26,7 @@ The `build` script takes arguments which may be used to customize the build.
    - Choices: `amd64` (default), `arm64` 
 - `--source-only`: Only build source archive
 - `--binary-only`: Only build the binary archives
-- `--debug`: creates the sources folder and keeps them in a `package-XYZ/output/run_<date_time>` folder of  local `package-XYZ` folder
+- `--leave-artifacts`: creates the sources folder and keeps them in a `package-XYZ/output/run_<date_time>` folder of  local `package-XYZ` folder
 - `--edit`: spawns a gardenlinux/repo-debian-snapshort container with `package-XYZ/output` mounted, quilt installed and configured.  
 
 ## GitHub action build
