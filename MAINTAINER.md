@@ -106,30 +106,26 @@ The **upstream source code** + the **debian/ folder** + **Garden Linux patches**
 
 The debian folder contains patches, configurations and rules to make and install the software. For more details about the required content of that debian folder, please read [debian documentation](https://www.debian.org/doc/manuals/maint-guide/dreq.en.html).
 
-To create a Garden Linux package, we also need a **debian/ folder** including all the required files. In the following we define how we **SHOULD** get the debian folder, depending on the case:
+To create a Garden Linux package, we also need a **debian/ folder** including all the required files.
+In the following we define how we **SHOULD** get the debian folder, depending on the case:
 
 
-#### Case 1: No debian package available 
+| Case | Recommended way to get debian folder | Debian Security Tracking? | Example | 
+| ---- | ----------- | -------------------------------------------------- | ------- |
+| Package not available in debian at all | manually maintain the **debian/ folder**. | not possible | metalbond |
+| Package available in debian testing | get debian folder from out apt snapshot | yes | systemd |
+| Package not available in debian testing, but in salsa | get debian folder from salsa | yes | our selected linux LTS |
 
-In this case, we must manually maintain the **debian/ folder**.
+We have two conflicting targets
+1. Get latest patches from debian automatically
+2. Reliable and streamlined package builds 
 
+If we force Garden Linux packages to get debian folder only from apt-src, then we are unaffected from git history inconsistencies (i.e. modified git tags).
+If we allow Garden Linux packages to get debian folder from salsa, then we could benefit from debian patches as long as debian maintains that version.
 
-#### Case 2: salsa maintains only debian folder
-In this case, we can get the **debian folder** from our debian apt snapshot.
+Therefore, the Maintainer needs to decide, but the recommended standard way is to base on apt-src, but there may be exceptions.
 
-
-🏗️⚠️ This section is currently being added and reworked ⚠️🚧
-
-- case 1: salsa maintains debian folder + a modified copy of the upstream sources
-- case 2: salsa maintains only debian folder
-- case 3: package does not exist in salsa
-- case 4: salsa is outdated
-
-🏗️⚠️ This section is currently being added and reworked ⚠️🚧
-
-
-
-#### Rule 4: For existing debian packages, get debian folder from Garden Linux snapshot apt repo
+#### Rule 4: Recommended way of getting debian folder is from snapshot apt-src repo
 Get debian/ Folder from those snapshots, as described below
 
 The helper script [apt_src](https://github.com/gardenlinux/package-build/blob/621c4c8f530a93884f7b9a4dfc348a50a2d19aa5/bin/source#L31C1-L31C8) must be used in prepare_source like this:
