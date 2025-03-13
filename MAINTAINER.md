@@ -99,7 +99,9 @@ We will walk through each step in detail below.
 ## Prepare the package Source
 
 The source to create a package consists of three parts. 
-The **upstream source code** + the **debian/ folder** + **Garden Linux patches**
+1. The **upstream source code**
+2. The **debian/ folder**
+3. **Garden Linux patches**
 
 
 ### Get debian/ folder
