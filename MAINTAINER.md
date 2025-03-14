@@ -96,13 +96,18 @@ Overview of steps to make a package for Garden Linux:
 We will walk through each step in detail below.
 
 
+
 ## Prepare the package Source
 
-The source to create a package consists of three parts. 
+The source to create a package consists of three parts.
 1. The **upstream source code**
 2. The **debian/ folder**
 3. **Garden Linux patches**
 
+It is the task of the Garden Linux package maintainer to define in the `prepare_source` script where to get upstream source, debian folder and what patches to add on top. 
+In the following we will go through each of the three mentioned parts, and how to assemble them.
+
+Since prepare_source is invoked directly in the package-build pipeline as step in [gardenlinux/package-build:bin/source](https://github.com/gardenlinux/package-build/blob/main/bin/source), we have access to multple helper functions inside the prepare_source script. Those helper scripts are introduced in context below.
 
 ### Get debian/ folder
 
@@ -146,6 +151,11 @@ For that, we use a scan tooling based on debian's uscan. Rules for this tool are
 To enable automatic upstream version tracking, get source from upstream git repository. 
 This means do NOT use apt source packages, do NOT use patches to update to a version.
 
+```
+version_orig=1234
+git_src --branch <BRANCH NAME> <GIT_REPO_URL>
+```
+
 ### Garden Linux Patches 
 
 Garden Linux Patches are applied on top of debian patches. 
@@ -153,12 +163,32 @@ Garden Linux Patches are applied on top of debian patches.
 > [!WARNING]
 > please see patching guide --- insert link here --- 
 
-#### Rule 7: Patching the patches 
+#### Rule 7: Patching debian patches 
 We consider the debian/patches folder as source, and changes to debian/patches are done and tracked via patches. 
+Patches for debian folder are put in folder `fixes_debian` and applied with helper function `apply_patches`.
+
+<details>
+  <summary>brief guide on how to create a Patch with package-build tools</summary>
+
+```
+package-build/build --leave-artifacts --source-only package-XYZ
+package-build/build --edit package-XYZ
+mkdir -p ../fixes_debian
+cd run_<DATE of RUN above>
+pushd b 
+# ... Do your changes, recommending quilt
+popd
+# create your patch
+diff -Naur a/debian b/debian > ../../fixes_debian/your-changes-and-fixes.patch 
+# append your patch to series file
+echo "your-changes-and-fixes" >> ../../fixes_debian/series
+```
+</details>
+
 
 
 #### Rule 8: Append to `debian/patches`
-Patches for upstream source are put in folder `upstream_patches` and applied with helper function [import_upstream_patches](https://github.com/gardenlinux/package-build/blob/621c4c8f530a93884f7b9a4dfc348a50a2d19aa5/bin/source#L122)
+Patches for upstream source are put in folder `upstream_patches` and applied with helper function `import_upstream_patches#`
 This helper function copies the patches to debian/patches and appends them to debian/patches/series 
 
 > [!NOTE]
@@ -177,6 +207,9 @@ The central gardenlinux/package-build repo contains reusable actions, that are u
 
 Input for this stage is a debian source package created by the previous stage.
 The central gardenlinux/package-build repo contains reusable actions, that are used to automatically perform this step, as well. 
+
+You can add a `prepare_binary` script to the package-XYZ repo to additionally perform some preparations before the binary build step is executed. 
+You could for example reconfigure debian build profiles, install build dependencies or add some logging flags for debugging.
 
 # Test binary package 
 
@@ -224,4 +257,6 @@ gh release create null ./null --title "Null release" --notes "null"
 
 
 If package-XYZ already has a null release but is not set as latest, you can set it manually as latest again to achieve the same result of gardenlinux/repo ignoring package-XYZ for next nightly apt repo.
+
+
 
