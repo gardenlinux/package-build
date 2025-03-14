@@ -11,6 +11,7 @@ skip_binary=
 build=binary
 build_dep_dir=
 gl_package_build_debug=
+edit=
 
 while [ $# -gt 0 ]; do
 	case "$1" in
@@ -38,8 +39,12 @@ while [ $# -gt 0 ]; do
 			build_dep_dir="$(realpath "$2")"
 			shift 2
 			;;
-		--debug)
+		--leave-artifacts)
 			gl_package_build_debug=true
+			shift
+			;;
+		--edit)
+			edit=true
 			shift
 			;;
 		*)
@@ -67,13 +72,16 @@ if [ -n "$build_dep_dir" ]; then
 	mount_opts+=(-v "$build_dep_dir:/opt/package_build/workdir/build_dep")
 fi
 
+if [ -n "$edit" ]; then
+  podman run --security-opt seccomp=unconfined --arch "$arch" -ti --rm "${mount_opts[@]}" -w "/opt/package_build/workdir/output" -e gl_package_build_debug="$gl_package_build_debug" "$container" /opt/package_build/bin/patchenv-init
+  exit $?
+fi
+
 if [ -z "$skip_source" ]; then
-  if [ -z "$gl_package_build_debug" ]; then
-	  podman run --security-opt seccomp=unconfined --arch "$arch" --rm "${mount_opts[@]}" -w "/opt/package_build/workdir" "$container" /opt/package_build/bin/source
-  else
-    echo "Starting package build container without --rm"
-	  podman run --security-opt seccomp=unconfined --arch "$arch" "${mount_opts[@]}" -w "/opt/package_build/workdir" -e gl_package_build_debug=true "$container" /opt/package_build/bin/source
+  if [ -n "$gl_package_build_debug" ]; then
+    mkdir -p $dir/output
   fi
+  podman run --security-opt seccomp=unconfined --arch "$arch" --rm "${mount_opts[@]}" -w "/opt/package_build/workdir" -e gl_package_build_debug="$gl_package_build_debug" "$container" /opt/package_build/bin/source
 fi
 if [ -z "$skip_binary" ]; then
 	podman run --security-opt seccomp=unconfined --arch "$arch" --rm "${mount_opts[@]}" -w "/opt/package_build/workdir" "$container" /opt/package_build/bin/binary "$build"

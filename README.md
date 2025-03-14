@@ -26,6 +26,8 @@ The `build` script takes arguments which may be used to customize the build.
    - Choices: `amd64` (default), `arm64` 
 - `--source-only`: Only build source archive
 - `--binary-only`: Only build the binary archives
+- `--leave-artifacts`: creates the sources folder and keeps them in a `package-XYZ/output/run_<date_time>` folder of  local `package-XYZ` folder
+- `--edit`: spawns a gardenlinux/repo-debian-snapshort container with `package-XYZ/output` mounted, quilt installed and configured.  
 
 ## GitHub action build
 
@@ -103,3 +105,6 @@ version_suffix=gl0~bp1443
 
 This will cause the package build to fetch all actual source file from the upstream openssl repo on github.com, while taking the debian folder from the apt source package.
 In the case that there are compatibility issues between the apt source debian folder and the new upstream source some patches might need to be added (see the apply_patches function in the source script).
+
+##
+

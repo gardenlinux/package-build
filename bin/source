@@ -135,6 +135,15 @@ import_upstream_patches() (
 	fi
 )
 
+handle_debug_exit()(
+  output_run_dir="$output/run_$(date +"%d-%m-%Y_%H:%M")"
+  cd / 
+  mv "$dir" $output_run_dir 
+  mv $output_run_dir/src $output_run_dir/a 
+  cp -r $output_run_dir/a $output_run_dir/b
+)
+
+
 email="contact@gardenlinux.io"
 maintainer="Garden Linux Builder"
 distribution=gardenlinux
@@ -144,12 +153,11 @@ version_suffix=gl~dev
 
 
 dir="$(mktemp -d)"
+output="$(pwd)/output"
 if [ -z "${gl_package_build_debug+x}" ]; then
   trap 'cd / && rm -rf "$dir"' EXIT
 else
-  trap 'echo $dir' EXIT
-  echo "Package sources are located in:"
-  echo "\t$dir"
+  trap handle_debug_exit EXIT
 fi
 
 mkdir "$dir/src"
@@ -184,7 +192,14 @@ chown -R user:users "$dir"
 	cd "$dir/src"
 	su -s /bin/sh -c 'dpkg-source --build .' user
 )
-rm -rf "$dir/src"
 
-mkdir -p .build
-cp -r "$dir/." .build/.
+# all artifacts including src folder are in output/run_<data-time> folder in case of debug (see EXIT trap)
+if [ -z "${gl_package_build_debug+x}" ]; then
+  rm -rf "$dir/src"
+  mkdir -p .build
+  cp -r "$dir/." .build/.
+fi
+
+
+
+
