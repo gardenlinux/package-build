@@ -118,14 +118,6 @@ In the following we define how we **SHOULD** get the debian folder, depending on
 | Package available in debian testing | get debian folder from out apt snapshot | yes | systemd |
 | Package not available in debian testing, but in salsa | get debian folder from salsa | yes | our selected linux LTS |
 
-We have two conflicting targets
-1. Get latest patches from debian automatically
-2. Reliable and streamlined package builds 
-
-If we force Garden Linux packages to get debian folder only from apt-src, then we are unaffected from git history inconsistencies (i.e. modified git tags).
-If we allow Garden Linux packages to get debian folder from salsa, then we could benefit from debian patches as long as debian maintains that version.
-
-Therefore, the Maintainer needs to decide, but the recommended standard way is to base on apt-src, but there may be exceptions.
 
 #### Rule 4: Recommended way of getting debian folder is from snapshot apt-src repo
 Get debian/ Folder from those snapshots, as described below
