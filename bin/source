@@ -135,7 +135,7 @@ import_upstream_patches() (
 	fi
 )
 
-handle_debug_exit()(
+handle_leave_artifacts_exit()(
   output_run_dir="$output/run_$(date +"%d-%m-%Y_%H:%M")"
   cd / 
   mv "$dir" $output_run_dir 
@@ -154,10 +154,10 @@ version_suffix=gl~dev
 
 dir="$(mktemp -d)"
 output="$(pwd)/output"
-if [ -z "${gl_package_build_debug+x}" ]; then
-  trap 'cd / && rm -rf "$dir"' EXIT
+if [ "$leave_artifacts" = "true" ]; then
+  trap handle_leave_artifacts_exit EXIT
 else
-  trap handle_debug_exit EXIT
+  trap 'cd / && rm -rf "$dir"' EXIT
 fi
 
 mkdir "$dir/src"
@@ -193,8 +193,8 @@ chown -R user:users "$dir"
 	su -s /bin/sh -c 'dpkg-source --build .' user
 )
 
-# all artifacts including src folder are in output/run_<data-time> folder in case of debug (see EXIT trap)
-if [ -z "${gl_package_build_debug+x}" ]; then
+# all artifacts including src folder are in output/run_<data-time> folder in case of leave_artifacts (see EXIT trap)
+if [ "$leave_artifacts" != "true" ]; then
   rm -rf "$dir/src"
   mkdir -p .build
   cp -r "$dir/." .build/.
