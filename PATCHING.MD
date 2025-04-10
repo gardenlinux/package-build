@@ -41,8 +41,25 @@ Preparations are defined in [package-build/bin/patchenv-init](https://github.com
 you can review those and use your local machine instead. 
 
 #### 3. Make your changes inside folder b 
-Debian guide references [this](http://www.shakthimaan.com/downloads/glv/quilt-tutorial/quilt-doc.pdf) tutorial, licensed under the GNU Free Documentation License, and may be a good starting point for you. 
 
+Keep folder `a` as is, and do your work in folder `b`.
+This will allow us later to produce a patch.
+
+At this stage, knowing how to use [quilt](https://en.wikipedia.org/wiki/Quilt_(software)) is very helpful.
+
+##### Quilt Quick Reference
+
+`quilt push` apply a single patch
+
+`quilt push -a` apply all patches
+
+`quilt push -f` force apply patches
+
+`quilt refresh` update patch files after manually editing source
+
+The Debian guide [references this tutorial](http://www.shakthimaan.com/downloads/glv/quilt-tutorial/quilt-doc.pdf), licensed under the GNU Free Documentation License, and may be a good starting point for you. 
+
+TODO: Add more explanation of quilt and what type of usages occur often in Garden Linux maintanance here.
 
 #### 4. Create the patch 
 
