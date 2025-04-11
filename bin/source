@@ -136,7 +136,7 @@ import_upstream_patches() (
 )
 
 handle_leave_artifacts_exit()(
-  output_run_dir="$output/run_$(date +"%d-%m-%Y_%H:%M")"
+  output_run_dir="$output/run_$(date -u +"%Y-%m-%dT%H-%M-%SZ")"
   cd / 
   mv "$dir" $output_run_dir 
   mv $output_run_dir/src $output_run_dir/a 
