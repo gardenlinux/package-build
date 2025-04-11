@@ -57,9 +57,10 @@ At this stage, knowing how to use [quilt](https://en.wikipedia.org/wiki/Quilt_(s
 
 `quilt refresh` update patch files after manually editing source
 
-The Debian guide [references this tutorial](http://www.shakthimaan.com/downloads/glv/quilt-tutorial/quilt-doc.pdf), licensed under the GNU Free Documentation License, and may be a good starting point for you.
+##### External Quilt References and Tutorials
 
-[wiki.debian.org: Using Quilt - Refresh a patch that failed to apply](https://wiki.debian.org/UsingQuilt#Refresh_a_patch_that_failed_to_apply)
+- The Debian guide [references this tutorial](http://www.shakthimaan.com/downloads/glv/quilt-tutorial/quilt-doc.pdf), licensed under the GNU Free Documentation License, and may be a good starting point for you.
+- [wiki.debian.org: Using Quilt - Refresh a patch that failed to apply](https://wiki.debian.org/UsingQuilt#Refresh_a_patch_that_failed_to_apply)
 
 TODO: Add more explanation of quilt and what type of usages occur often in Garden Linux maintanance here.
 
