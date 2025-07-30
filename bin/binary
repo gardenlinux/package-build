@@ -17,8 +17,6 @@ if [ "$build" != binary ] && ! awk -F ': ' '$1 == "Architecture" { print $2 }' <
 	exit 0
 fi
 
-apt-get install --no-install-recommends -y --allow-downgrades ./build_dep/*_all.deb ./build_dep/*_"$(dpkg --print-architecture)".deb
-
 dpkg-source --extract "$dsc" "$dir/src"
 
 if [ -f prepare_binary ]; then
