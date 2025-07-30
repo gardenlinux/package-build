@@ -19,7 +19,6 @@ fi
 
 apt-get install --no-install-recommends -y --allow-downgrades ./build_dep/*_all.deb ./build_dep/*_"$(dpkg --print-architecture)".deb
 
-apt-get build-dep --no-install-recommends -y "$(realpath "$dsc")"
 dpkg-source --extract "$dsc" "$dir/src"
 
 if [ -f prepare_binary ]; then
