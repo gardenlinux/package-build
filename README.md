@@ -106,5 +106,27 @@ version_suffix=gl0~bp1443
 This will cause the package build to fetch all actual source file from the upstream openssl repo on github.com, while taking the debian folder from the apt source package.
 In the case that there are compatibility issues between the apt source debian folder and the new upstream source some patches might need to be added (see the apply_patches function in the source script).
 
-##
+#### Example: Backporting a Package Already in nightly Releases
 
+Suppose you want to backport a package (for example, `gnutls28` version 3.8.9-3) that was previously available in Debian testing and is therefore present in a GardenLinux nightly snapshot. In this case, you can use the following approach in your `prepare_source` script:
+
+```
+pkg=gnutls28
+version_orig=3.8.9
+version="${version_orig}-3"
+version_suffix="gl1+bp1592"
+
+# Option 1: Use a known snapshot timestamp
+# snapshot_timestamp=1754597610
+
+# Option 2: Search through Garden Linux nightly versions
+start_gl_version="1982" # Start searching from this GL nightly version and search back 30 versions
+snapshot_timestamp=$(pkg_version_in_gl_version "$pkg" "$version" "$start_gl_version" 30)
+
+# Get sources from snapshot timestamp
+snapshot_src "$pkg" "$snapshot_timestamp"
+```
+
+This approach tells the package build system to retrieve the `.orig.tar` and `.debian.tar` source archives for the specified version from the most recent available GardenLinux snapshot (starting from `start_gl_version` and searching backwards). It then rebuilds the package exactly as it was in that nightly release.
+
+##

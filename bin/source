@@ -130,19 +130,210 @@ import_upstream_patches() (
 
 			mkdir -p "$(dirname "$dir/src/debian/patches/$patch")"
 			cp "$patch_dir/$patch" "$dir/src/debian/patches/$patch"
-			echo "$patch" >> "$dir/src/debian/patches/series"
-		done < "$patch_dir/series"
+			echo "$patch" >>"$dir/src/debian/patches/series"
+		done <"$patch_dir/series"
 	fi
 )
 
-handle_leave_artifacts_exit()(
-  output_run_dir="$output/run_$(date -u +"%Y-%m-%dT%H-%M-%SZ")"
-  cd / 
-  mv "$dir" $output_run_dir 
-  mv $output_run_dir/src $output_run_dir/a 
-  cp -r $output_run_dir/a $output_run_dir/b
+# Usage:
+# pkg_version_in_gl_version <package_name> <version> <start_version> [max_versions_back] [base_url]
+#
+# Searches for a snapshot by searching through Garden Linux versions (e.g., 1882.0, 1881.0, etc.).
+# - <package_name>: The source package name to search for
+# - <version>: The exact version to find (e.g., "3.8.9-3")
+# - <start_version>: Starting GL version to search from (e.g., "1882")
+# - [max_versions_back]: Maximum number of versions to search backwards (default: 30)
+# - [base_url]: Optional base URL (defaults to https://packages.gardenlinux.io)
+# Returns the "gl:$version" if found, or exits with error if not found.
+pkg_version_in_gl_version() (
+	pkg="$1"
+	version="$2"
+	start_version="$3"
+	max_versions_back="${4:-30}"
+	base_url="${5:-https://packages.gardenlinux.io}"
+
+	tmp_dir="$(mktemp -d)"
+	trap 'cd / && rm -rf "$tmp_dir"' EXIT
+
+	command -v curl >/dev/null || apt-get install --no-install-recommends -y curl >&2
+	command -v gunzip >/dev/null || apt-get install --no-install-recommends -y gzip >&2
+
+	echo "Searching for package '$pkg' version '$version' starting from GL version $start_version..." >&2
+
+	major=$(echo "$start_version" | cut -d. -f1)
+	minor=0
+
+	versions_checked=0
+	while [ "$versions_checked" -lt "$max_versions_back" ]; do
+		current_version="${major}.${minor}"
+		sources_url="${base_url}/gardenlinux/dists/${current_version}/main/source/Sources.gz"
+		echo "Checking GL version $current_version at $sources_url..." >&2
+
+		if curl -sSLf "$sources_url" -o "${tmp_dir}/sources_${current_version}.gz" 2>/dev/null; then
+			echo "Found GL version $current_version, checking for package..." >&2
+
+			if gunzip -c "${tmp_dir}/sources_${current_version}.gz" >"${tmp_dir}/sources_${current_version}.txt" 2>/dev/null; then
+				if grep -q "^Package: $pkg$" "${tmp_dir}/sources_${current_version}.txt"; then
+					pkg_version=$(awk -v pkg="$pkg" '
+						/^Package: / { if ($2 == pkg) { in_package = 1; next } else { in_package = 0; next } }
+						in_package && /^Version: / { print $2; exit }
+					' "${tmp_dir}/sources_${current_version}.txt")
+					if [ -n "$pkg_version" ]; then
+						echo "GL version $current_version has package '$pkg' version '$pkg_version'" >&2
+
+						if [ "$pkg_version" = "$version" ]; then
+							echo "✓ MATCH: Found GL version $current_version with package '$pkg' version '$version'" >&2
+							rm -f "${tmp_dir}/sources_${current_version}.gz" "${tmp_dir}/sources_${current_version}.txt"
+							echo "gl:${current_version}"
+							return 0
+						fi
+					else
+						echo "GL version $current_version has package '$pkg' but could not determine version" >&2
+					fi
+				else
+					echo "GL version $current_version does not contain package '$pkg'" >&2
+				fi
+
+				rm -f "${tmp_dir}/sources_${current_version}.txt"
+			else
+				echo "ERROR: Failed to decompress Sources file for GL version $current_version" >&2
+			fi
+
+			rm -f "${tmp_dir}/sources_${current_version}.gz"
+		else
+			echo "GL version $current_version not found or not accessible" >&2
+		fi
+
+		major=$((major - 1))
+
+		versions_checked=$((versions_checked + 1))
+	done
+
+	echo "Error: No snapshot found containing package '$pkg' version '$version' in the last $max_versions_back GL versions from $start_version" >&2
+	exit 1
 )
 
+# Usage:
+# snapshot_src <package_name> <snapshot_timestamp> [base_url]
+#
+# Downloads and extracts source files from a Garden Linux snapshot repository.
+# - <package_name>: The source package name to download
+# - <snapshot_timestamp>: The snapshot timestamp to use
+# - [base_url]: Optional base URL (defaults to https://packages.gardenlinux.io)
+snapshot_src() (
+	pkg="$1"
+	snapshot_timestamp="$2"
+	base_url="${3:-https://packages.gardenlinux.io}"
+
+	command -v curl >/dev/null || apt-get install --no-install-recommends -y curl >&2
+	command -v gunzip >/dev/null || apt-get install --no-install-recommends -y gzip >&2
+	command -v xz >/dev/null || apt-get install --no-install-recommends -y xz-utils >&2
+
+	# Check if this is a GL version (format: gl:XXXX.X)
+	if [[ "$snapshot_timestamp" =~ ^gl: ]]; then
+		gl_version="${snapshot_timestamp#gl:}"
+		sources_url="${base_url}/gardenlinux/dists/${gl_version}/main/source/Sources.gz"
+		echo "Using GL version $gl_version" >&2
+	else
+		# Regular timestamp-based snapshot
+		sources_url="${base_url}/debian-snapshot/dists/${snapshot_timestamp}/main/source/Sources.gz"
+		echo "Using snapshot timestamp $snapshot_timestamp" >&2
+	fi
+	if ! curl -sSLf "$sources_url" | gunzip >Sources; then
+		echo "Error: Failed to download Sources file from $sources_url" >&2
+		exit 1
+	fi
+
+	package_section=$(awk -v pkg="$pkg" '
+		/^Package: / {
+			if ($2 == pkg) {
+				in_package = 1;
+				next
+			} else {
+				in_package = 0;
+				next
+			}
+		}
+		in_package && /^$/ && package_started {
+			exit
+		}
+		in_package {
+			package_started = 1;
+			print
+		}
+	' Sources)
+
+	if [ -z "$package_section" ]; then
+		echo "Error: Package '$pkg' not found in snapshot" >&2
+		exit 1
+	fi
+
+	directory=$(echo "$package_section" | grep "^Directory:" | cut -d' ' -f2)
+
+	if [ -z "$directory" ]; then
+		echo "Error: Directory not found for package '$pkg'" >&2
+		exit 1
+	fi
+
+	# Extract the list of source files from the package section
+	files_list=$(echo "$package_section" | awk '
+		/^Files:/ {in_files=1; next}
+		in_files && /^[^ ]/ {exit}
+		in_files && /^ / {print $3}
+	')
+	# Filter for .orig and .debian tarballs, ignore .asc signatures, and ensure uniqueness.
+	files=$(echo "$files_list" | grep -F "${pkg}_" | grep -E '\.(orig|debian)\.tar\.' | grep -v '\.asc$' | sort -u)
+
+	if [ -z "$files" ]; then
+		echo "Error: No source files found for package '$pkg'" >&2
+		exit 1
+	fi
+
+	mkdir -p "$dir/src"
+
+	for file in $files; do
+		# Check if this is a GL version to use the correct URL structure
+		if [[ "$snapshot_timestamp" =~ ^gl: ]]; then
+			file_url="${base_url}/gardenlinux/${directory}/${file}"
+		else
+			file_url="${base_url}/${directory}/${file}"
+		fi
+		case "$file" in
+		*.orig.tar.* | *.debian.tar.*)
+			case "$file" in
+			*.xz) decompressor="xz -d" ;;
+			*.gz) decompressor="gzip -d" ;;
+			*.bz2) decompressor="bzip2 -d" ;;
+			esac
+			tar_opts="--directory \"$dir/src\""
+			# Only strip components for orig tarballs
+			[[ "$file" == *.orig.tar.* ]] && tar_opts="--strip-components 1 $tar_opts"
+
+			if [[ "$file" == *.orig.tar.* ]]; then
+				# For orig files, save to orig.tar and extract
+				if ! curl -Lf "$file_url" | $decompressor | tee "$dir/orig.tar" | eval tar xf - $tar_opts; then
+					echo "Error: Failed to download/extract $file" >&2
+					exit 1
+				fi
+			else
+				# For debian files, just extract
+				if ! curl -Lf "$file_url" | $decompressor | eval tar xf - $tar_opts; then
+					echo "Error: Failed to download/extract $file" >&2
+					exit 1
+				fi
+			fi
+			;;
+		esac
+	done
+)
+
+handle_leave_artifacts_exit() (
+	output_run_dir="$output/run_$(date -u +"%Y-%m-%dT%H-%M-%SZ")"
+	cd /
+	mv "$dir" $output_run_dir
+	mv $output_run_dir/src $output_run_dir/a
+	cp -r $output_run_dir/a $output_run_dir/b
+)
 
 email="contact@gardenlinux.io"
 maintainer="Garden Linux Builder"
