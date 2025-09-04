@@ -84,7 +84,7 @@ To create a patch release for this version:
    git checkout <VERSION>
    ```
 2. Apply modifications or backport patches from main
-3. Increment the version suffix. The GitHub action job which created the `<VERSION>gardenlinux0` tag automatically added a `version_suffix=gardenlinux0` line to the `prepare_source` script. Simply increment this suffix. In certain scenarios you might want to backport this to an older GardenLinux version; in this case you will need to also update the _.containerfile_ and use the proper one; e.g. _ghcr.io/gardenlinux/repo-debian-snapshot@sha256:3577da968aa41816bf255e189925c6c67df1266effe800a7d0cd66cddc5760ca_ for version 1443.
+3. Increment the version suffix. The GitHub action job which created the `<VERSION>gardenlinux0` tag automatically added a `version_suffix=gardenlinux0` line to the `prepare_source` script. Simply increment this suffix. In certain scenarios you might want to backport this to an older GardenLinux version; in this case you will need to also update the _.container_ file and use the proper one; e.g. _ghcr.io/gardenlinux/repo-debian-snapshot@sha256:3577da968aa41816bf255e189925c6c67df1266effe800a7d0cd66cddc5760ca_ for version 1443.
 4. Push the branch
    ```
    git push origin <VERSION>
@@ -108,25 +108,48 @@ In the case that there are compatibility issues between the apt source debian fo
 
 #### Example: Backporting a Package Already in nightly Releases
 
-Suppose you want to backport a package (for example, `gnutls28` version 3.8.9-3) that was previously available in Debian testing and is therefore present in a GardenLinux nightly snapshot. In this case, you can use the following approach in your `prepare_source` script:
+Suppose you want to backport a package (for example, `jq` version `1.8.1`) that was previously available in Debian testing and is therefore tracked in debian's salsa repository. In this case, you can use the following approach in your `prepare_source` script:
 
 ```
-pkg=gnutls28
-version_orig=3.8.9
-version="${version_orig}-3"
-version_suffix="gl1+bp1592"
+pkg=jq
+version_orig=1.8.1
+version="$version_orig-3"
+# look up in salsa what the correct branch is
+git_src -b "debian/$version" https://salsa.debian.org/debian/jq.git
+
+version_suffix=gl0+bp1877
+```
+
+This approach tells the package build system to simply checkout the debian salsa repo in a specific branch. It then rebuilds the package exactly as it was in that nightly release.
+
+#### Example: Backporting a Package Already in nightly Releases - last resort - missing salsa sources
+
+> [!Warning]
+> Use this method only as a last resort if the source code (or parts of it) is not available in debian salsa or upstream sources differ a lot.
+> In all other cases, this method is discouraged.
+
+Suppose you want to backport a package (for example, `sqlite3` version `3.46.1`) that was previously available in Debian testing, but is not—or only partially—available in Debian's salsa repository. However, the package is still present in our daily repository snapshots, which are also used for our nightly releases. In this situation, you can use the following approach in your `prepare_source` script:
+
+```
+pkg=sqlite3
+version_orig=3.46.1
+version="${version_orig}-7"
+version_suffix="gl0+bp1877"
 
 # Option 1: Use a known snapshot timestamp
-# snapshot_timestamp=1754597610
+# snapshot=1754316590
 
 # Option 2: Search through Garden Linux nightly versions
-start_gl_version="1982" # Start searching from this GL nightly version and search back 30 versions
-snapshot_timestamp=$(pkg_version_in_gl_version "$pkg" "$version" "$start_gl_version" 30)
+snapshot_gl_version="1943" # Start searching from this GL nightly version and search forward 30 versions
+snapshot=$(pkg_version_in_gl_version "$pkg" "$version" "$snapshot_gl_version" 30)
 
-# Get sources from snapshot timestamp
+# Get sources from snapshot
 snapshot_src "$pkg" "$snapshot_timestamp"
 ```
 
-This approach tells the package build system to retrieve the `.orig.tar` and `.debian.tar` source archives for the specified version from the most recent available GardenLinux snapshot (starting from `start_gl_version` and searching backwards). It then rebuilds the package exactly as it was in that nightly release.
+> [!Note]
+> The debian snapshots can be a useful a hint since when GardenLinux snapshots contain a certain package version.
+> e.g. goto https://snapshot.debian.org/package/sqlite3/3.46.1-7/ look for the date `2025-07-26` and but that into
+> `bin/garden-version --major 2025-07-26`, you will get `1943` as a candidate version for `snapshot_gl_version`.
 
-##
+This approach tells the package build system to retrieve the `.orig.tar` and `.debian.tar` source archives for the specified version from the earliest available GardenLinux snapshot (starting from `snapshot_gl_version` and searching forward). It then rebuilds the package exactly as it was in that nightly release.

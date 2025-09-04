@@ -136,20 +136,20 @@ import_upstream_patches() (
 )
 
 # Usage:
-# pkg_version_in_gl_version <package_name> <version> <start_version> [max_versions_back] [base_url]
+# pkg_version_in_gl_version <package_name> <version> <start_version> [max_versions] [base_url]
 #
 # Searches for a snapshot by searching through Garden Linux versions (e.g., 1882.0, 1881.0, etc.).
 # - <package_name>: The source package name to search for
 # - <version>: The exact version to find (e.g., "3.8.9-3")
 # - <start_version>: Starting GL version to search from (e.g., "1882")
-# - [max_versions_back]: Maximum number of versions to search backwards (default: 30)
+# - [max_versions]: Maximum number of versions to search forwards (default: 30)
 # - [base_url]: Optional base URL (defaults to https://packages.gardenlinux.io)
 # Returns the "gl:$version" if found, or exits with error if not found.
 pkg_version_in_gl_version() (
 	pkg="$1"
 	version="$2"
 	start_version="$3"
-	max_versions_back="${4:-30}"
+	max_versions="${4:-30}"
 	base_url="${5:-https://packages.gardenlinux.io}"
 
 	tmp_dir="$(mktemp -d)"
@@ -164,7 +164,7 @@ pkg_version_in_gl_version() (
 	minor=0
 
 	versions_checked=0
-	while [ "$versions_checked" -lt "$max_versions_back" ]; do
+	while [ "$versions_checked" -lt "$max_versions" ]; do
 		current_version="${major}.${minor}"
 		sources_url="${base_url}/gardenlinux/dists/${current_version}/main/source/Sources.gz"
 		echo "Checking GL version $current_version at $sources_url..." >&2
@@ -204,25 +204,25 @@ pkg_version_in_gl_version() (
 			echo "GL version $current_version not found or not accessible" >&2
 		fi
 
-		major=$((major - 1))
+		major=$((major + 1))
 
 		versions_checked=$((versions_checked + 1))
 	done
 
-	echo "Error: No snapshot found containing package '$pkg' version '$version' in the last $max_versions_back GL versions from $start_version" >&2
+	echo "Error: No snapshot found containing package '$pkg' version '$version' in the last $max_versions GL versions from $start_version" >&2
 	exit 1
 )
 
 # Usage:
-# snapshot_src <package_name> <snapshot_timestamp> [base_url]
+# snapshot_src <package_name> <snapshot> [base_url]
 #
 # Downloads and extracts source files from a Garden Linux snapshot repository.
 # - <package_name>: The source package name to download
-# - <snapshot_timestamp>: The snapshot timestamp to use
+# - <snapshot>: The snapshot timestamp or GL version to use (e.g. "1754597610" or "gl:1982")
 # - [base_url]: Optional base URL (defaults to https://packages.gardenlinux.io)
 snapshot_src() (
 	pkg="$1"
-	snapshot_timestamp="$2"
+	snapshot="$2"
 	base_url="${3:-https://packages.gardenlinux.io}"
 
 	command -v curl >/dev/null || apt-get install --no-install-recommends -y curl >&2
@@ -230,14 +230,14 @@ snapshot_src() (
 	command -v xz >/dev/null || apt-get install --no-install-recommends -y xz-utils >&2
 
 	# Check if this is a GL version (format: gl:XXXX.X)
-	if [[ "$snapshot_timestamp" =~ ^gl: ]]; then
-		gl_version="${snapshot_timestamp#gl:}"
+	if [[ "$snapshot" =~ ^gl: ]]; then
+		gl_version="${snapshot#gl:}"
 		sources_url="${base_url}/gardenlinux/dists/${gl_version}/main/source/Sources.gz"
 		echo "Using GL version $gl_version" >&2
 	else
 		# Regular timestamp-based snapshot
-		sources_url="${base_url}/debian-snapshot/dists/${snapshot_timestamp}/main/source/Sources.gz"
-		echo "Using snapshot timestamp $snapshot_timestamp" >&2
+		sources_url="${base_url}/debian-snapshot/dists/${snapshot}/main/source/Sources.gz"
+		echo "Using snapshot timestamp $snapshot" >&2
 	fi
 	if ! curl -sSLf "$sources_url" | gunzip >Sources; then
 		echo "Error: Failed to download Sources file from $sources_url" >&2
@@ -293,7 +293,7 @@ snapshot_src() (
 
 	for file in $files; do
 		# Check if this is a GL version to use the correct URL structure
-		if [[ "$snapshot_timestamp" =~ ^gl: ]]; then
+		if [[ "$snapshot" =~ ^gl: ]]; then
 			file_url="${base_url}/gardenlinux/${directory}/${file}"
 		else
 			file_url="${base_url}/${directory}/${file}"
