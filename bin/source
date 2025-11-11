@@ -113,6 +113,10 @@ import_src() (
 apply_patches() (
 	patch_dir="${1-patches}"
 	if [ -f "$patch_dir/series" ]; then
+		if [[ -s "$patch_dir/series" && "$(tail -c 1 "$patch_dir/series" | wc -l)" != 1 ]]; then
+			echo "series file must end with a newline" >&2
+			exit 1
+		fi
 		while read -r patch; do
 			(cd "$dir/src" && patch -p1;) < "$patch_dir/$patch"
 		done < "$patch_dir/series"
@@ -122,6 +126,10 @@ apply_patches() (
 import_upstream_patches() (
 	patch_dir="${1-upstream_patches}"
 	if [ -f "$patch_dir/series" ]; then
+		if [[ -s "$patch_dir/series" && "$(tail -c 1 "$patch_dir/series" | wc -l)" != 1 ]]; then
+			echo "series file must end with a newline" >&2
+			exit 1
+		fi
 		while read -r patch; do
 			if [ -e "$dir/src/debian/patches/$patch" ]; then
 				echo "patch $patch already exists in debian/patches" >&2
@@ -390,7 +398,3 @@ if [ "$leave_artifacts" != "true" ]; then
   mkdir -p .build
   cp -r "$dir/." .build/.
 fi
-
-
-
-
