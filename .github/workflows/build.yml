@@ -71,6 +71,12 @@ jobs:
         name: check version
         run: |
           ls -lah .build
+          if [ -f .build/skip_everything ]; then
+            echo "skipping everything..."
+            echo skip_build=true >> "$GITHUB_OUTPUT"
+            echo skip_release=true >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           pkg="$(awk -F ': ' '$1 == "Source" { print $2 }' < .build/*.dsc)"
           version="$(awk -F ': ' '$1 == "Version" { print $2 }' < .build/*.dsc | tr '~' '+')"
           version="${version#*:}"
