@@ -72,6 +72,7 @@ jobs:
             !.git
       - id: tag
         name: check version
+        if: inputs.publish_release
         run: |
           ls -lah .build
           if [ -f .build/skip_everything ]; then
