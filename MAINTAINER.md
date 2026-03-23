@@ -237,6 +237,9 @@ Packages for patch releases are also uploaded to the GitHub Release page, but mu
 ## Disable a package-XYZ repository (NULL release handling)
 If a package-XYZ build must be excluded in next nightly apt repositories, a so called "NULL release" must be published for package-XYZ. 
 
+> [!IMPORTANT]
+> If you want to remove/archive a package from Garden Linux by creating a null release, please follow this [guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo).
+
 ### What happens under the hood
 The [fetch_releases](https://github.com/gardenlinux/repo/blob/main/fetch_releases) script runs as part of the github actions of gardenlinux/repo. 
 `fetch_releases` goes through all repositories in gardenlinux org, and gets the latest release tag. 
