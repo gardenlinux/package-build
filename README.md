@@ -29,6 +29,36 @@ The `build` script takes arguments which may be used to customize the build.
 - `--leave-artifacts`: creates the sources folder and keeps them in a `package-XYZ/output/run_<date_time>` folder of  local `package-XYZ` folder
 - `--edit`: spawns a gardenlinux/repo-debian-snapshort container with `package-XYZ/output` mounted, quilt installed and configured.  
 
+## Package build API
+
+Package builds make use of shell functions which are defined in this repo.
+
+### `prepare_source`
+
+`apt_src [--ignore-orig] $package_name`
+
+Use source code from a given apt source package.
+
+`git_src $git_url`
+
+Use source code from a remote git repository
+
+`import_src $path`
+
+Use source code from a local path (todo: how does that work?)
+
+`apply_patched [patch_dir(default=./patches)]`
+
+Apply patches from a directory.
+By convention the directory is called `patches`.
+Another name may be chosen and passed as a parameter.
+
+The `patches` directory requires a `series` file listing the patches in the order to be applied, and the patch files.
+
+`import_upstream_patches [patch_dir(default=./upstream_patches)]`
+
+### `prepare_binary`
+
 ## GitHub action build
 
 To build using GitHub actions simply define a job with
