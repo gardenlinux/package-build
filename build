@@ -64,12 +64,12 @@ if [ -z "$container" ]; then
 fi
 
 mount_opts=(
-	-v "$src_dir/bin:/opt/package_build/bin"
-	-v "$dir:/opt/package_build/workdir"
+	-v "$src_dir/bin:/opt/package_build/bin:Z"
+	-v "$dir:/opt/package_build/workdir:Z"
 )
 
 if [ -n "$build_dep_dir" ]; then
-	mount_opts+=(-v "$build_dep_dir:/opt/package_build/workdir/build_dep")
+	mount_opts+=(-v "$build_dep_dir:/opt/package_build/workdir/build_dep:Z")
 fi
 
 if [ -n "$edit" ]; then
