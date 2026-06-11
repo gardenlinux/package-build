@@ -1,6 +1,6 @@
 ---
 title: NULL Releases
-description: Learn how to use NULL releases to exclude Packages frin Garden Linux builds
+description: Learn how to use NULL releases to exclude Packages from Garden Linux builds
 order: 7
 related_topics:
   - /explanation/release-hierarchy.md
@@ -92,7 +92,7 @@ to re-enable a package that was previously disabled with a NULL release, you hav
 
 ## Important Considerations
 
-:::error
+:::danger
 If you want to permanently remove/archive a package from Garden Linux, please follow the [official guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo) in the gardenlinux/repo repository.
 :::
 
