@@ -93,7 +93,7 @@ to re-enable a package that was previously disabled with a NULL release, you hav
 ## Important Considerations
 
 :::danger
-If you want to permanently remove/archive a package from Garden Linux, please follow the [official guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo) in the gardenlinux/repo repository.
+If you want to permanently remove/archive a package from Garden Linux, follow the [official guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo) in the gardenlinux/repo repository.
 :::
 
 :::warning

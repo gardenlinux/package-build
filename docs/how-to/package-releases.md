@@ -1,6 +1,6 @@
 ---
 title: Creating Package Releases
-description: Comprehensive guide to creating Garden Linux Package releases
+description: Complete guide to creating Garden Linux Package releases
 order: 1
 related_topics:
   - /explanation/release-hierarchy.md
@@ -40,7 +40,7 @@ This document is about the first tier, the [Packaging](/explanation/packaging).
 
 ## Understanding Packaging
 
-Please read the [Packaging Explanation](/explanation/packaging.md) to get familiar with the concepts of Packaging.
+Read the [Packaging Explanation](/explanation/packaging.md) to get familiar with the concepts of Packaging.
 
 ## Prerequisites
 
@@ -96,7 +96,7 @@ No manual action is required for major release APT repositories.
 
 **For Minor Releases:**
 
-Follow the comprehensive guide: [Creating APT Repository Releases](/how-to/releases/apt-repos.md)
+Follow the complete guide: [Creating APT Repository Releases](/how-to/releases/apt-repos.md)
 
 Quick summary:
 

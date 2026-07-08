@@ -66,7 +66,7 @@ To create a bp-package repository:
 The bp-package repository is **not** included in the `package-releases` file of gardenlinux/repo, but it is included in the build of the dependent package.
 
 :::danger
-In rescent Garden Linux Release, some `bp-*` packages ended up in the `package-releases` files. Please be aware of this.
+In rescent Garden Linux Release, some `bp-*` packages ended up in the `package-releases` files. Be aware of this.
 :::
 
 ## Using Build Dependencies in Workflows

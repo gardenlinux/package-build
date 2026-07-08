@@ -1,6 +1,6 @@
 ---
 title: Packaging
-description: Comprehensive guide to the Garden Linux packaging system and release lifecycle
+description: Complete guide to the Garden Linux packaging system and release lifecycle
 related_topics:
   - /explanation/release-hierarchy.md
   - /explanation/packaging.md
