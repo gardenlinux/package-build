@@ -208,7 +208,7 @@ The central gardenlinux/package-build repo contains reusable actions, that are u
 Input for this stage is a debian source package created by the previous stage.
 The central gardenlinux/package-build repo contains reusable actions, that are used to automatically perform this step, as well. 
 
-You can add a `prepare_binary` script to the package-XYZ repo to additionally perform some preparations before the binary build step is executed. 
+You can add a `prepare_binary` script to the package-XYZ repo to perform additional preparations before the binary build step is executed. 
 You could for example reconfigure debian build profiles, install build dependencies or add some logging flags for debugging.
 
 # Test binary package 
