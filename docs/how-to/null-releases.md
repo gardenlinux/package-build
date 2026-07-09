@@ -43,7 +43,7 @@ NULL releases are used to:
 - Exclude packages with licensing or security issues
 - Mark deprecated packages
 
-## How NULL Releases Work
+## How NULL releases work
 
 The null release mechanism operates through several components in the Garden Linux infrastructure:
 

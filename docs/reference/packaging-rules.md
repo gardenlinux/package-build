@@ -31,7 +31,7 @@ github_target_path: docs/reference/packaging-rules.md
 
 This reference document outlines the authoritative rules for creating and maintaining Garden Linux packages. These rules ensure consistency, security, and maintainability across the package ecosystem.
 
-## Package Repository Naming
+## Package repository naming
 
 To ensure clear identification and standardized tooling, package repositories follow a strict naming convention.
 
@@ -61,7 +61,7 @@ Package repositories required only as a build dependency for another backported 
 - `bp-package-xyz-0.0.1` - Build dependency only needed for package-ABC
 - `bp-package-libfoo-1.2.3` - Build dependency for a backported library
 
-## Git Branch Naming
+## Git branch naming
 
 Branch names in package repositories follow standardized patterns to indicate their purpose and compatibility.
 
@@ -79,7 +79,7 @@ Branch names in package repositories follow standardized patterns to indicate th
 - `rel-<MAJOR>` branches are used for backporting packages to specific major versions
 - Temporary branches (`fix/*`, `feat/*`) are for development work and should be deleted after merging
 
-## Source Acquisition
+## Source acquisition
 
 ### Rule 4: Get debian/ folder from Garden Linux snapshot apt repository
 
@@ -102,7 +102,7 @@ All Debian packages from testing are mirrored daily in a Garden Linux snapshot a
 3. If not present, check salsa.debian.org for current debian/ folder
 4. Use `git_src` to get from salsa if needed
 
-## Package Creation
+## Package creation
 
 ### Rule 5: Create debian/ folder only if Debian package does not exist
 
@@ -122,7 +122,7 @@ The `debian/` folder should include:
 - `source/format`
 - Appropriate patches in `patches/`
 
-## Upstream Source
+## Upstream source
 
 ### Rule 6: Get upstream source from upstream git repository
 
@@ -187,6 +187,6 @@ import_upstream_patches# upstream_patches
 This approach allows convenient import and maintenance of patches from upstream (e.g., cherry-picking an upstream commit on a different branch to fix a CVE).
 :::
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

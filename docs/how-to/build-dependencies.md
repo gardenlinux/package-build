@@ -69,7 +69,7 @@ The bp-package repository is **not** included in the `package-releases` file of 
 In rescent Garden Linux Release, some `bp-*` packages ended up in the `package-releases` files. Be aware of this.
 :::
 
-## Using Build Dependencies in Workflows
+## Using build dependencies in workflows
 
 Specify the build dependency in the GitHub Actions workflow of the main package using the `build_dep` parameter.
 
@@ -92,7 +92,7 @@ jobs:
 - `build_dep`: Specifies the dependency repository and version in the format `<repo> <tag>`
 - The dependency is automatically fetched and made available during the build
 
-## Complete Example
+## Complete example
 
 For a package that requires a patched version of libtool:
 
@@ -106,7 +106,7 @@ build_dep: gardenlinux/bp-package-libtool 0.0.1-0gl0+bp1
 
 The build system will automatically fetch the dependency and use it during compilation.
 
-## Important Notes
+## Important notes
 
 :::warning
 Build-time dependencies between packages are not updated automatically and need to be adjusted manually when needed.
@@ -120,6 +120,6 @@ bp-package repositories should be kept minimal and focused only on providing the
 For widely-used dependencies that will be needed by multiple packages, consider adding them to the base Garden Linux environment instead of using bp-package.
 :::
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

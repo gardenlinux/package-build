@@ -28,17 +28,17 @@ github_source_path: docs/how-to/package-releases.md
 github_target_path: docs/how-to/releases/package-releases.md
 ---
 
-# Creating Package Releases
+# Creating package releases
 
 This guide explains how to create Garden Linux Package releases.
 
-## Release Hierarchy
+## Release hierarchy
 
 Garden Linux uses a [three-tier release hierarchy](/explanation/release-hierarchy.md) to deliver a complete operating system.
 
 This document is about the first tier, the [Packaging](/explanation/packaging).
 
-## Understanding Packaging
+## Understanding packaging
 
 Read the [Packaging Explanation](/explanation/packaging.md) to get familiar with the concepts of Packaging.
 
@@ -51,7 +51,7 @@ Before creating an OS release, ensure you have:
 
 ## Phase 0: Preparation
 
-### Step 1: Decide What to Include
+### Step 1: Decide what to include
 
 In tier one, individual [packages](/explanation/packaging.md) will need updates based on e.g. recent CVEs. Check for potential upgrades in important packages, too:
 
@@ -77,9 +77,9 @@ The complexity of updating a package varies:
 
 For complex updates, thoroughly test the new package version before including it in a release.
 
-## Phase 1: Creating the Release
+## Phase 1: Creating the release
 
-### Step 1: Create APT Repository Release
+### Step 1: Create APT repository release
 
 In tier two, the [APT repository](/explanation/repo-infrastructure.md) must be created before building OS images.
 
@@ -196,7 +196,7 @@ gh workflow run nightly.yml \
 - Verify all build jobs complete successfully
 - Check that artifacts are published
 
-### Step 3: Create GitHub Release
+### Step 3: Create GitHub release
 
 After the build completes, create the official GitHub release page:
 
@@ -284,7 +284,7 @@ git push -u origin rel-2150
 
 This branch is used for creating future minor releases of the APT repository.
 
-### Step 5: Generate CPE File
+### Step 5: Generate CPE file
 
 Generate the Common Platform Enumeration (CPE) file for the new release:
 
@@ -307,27 +307,27 @@ Or via GitHub UI:
 3. Select `main` branch
 4. Set version to `MAJOR.MINOR.0`
 
-### Step 6: Update Garden Linux Documentation
+### Step 6: Update Garden Linux documentation
 
 :::info
 TODO: add steps on how to update the documentation
 :::
 
-## Phase 2: Post-Release Work
+## Phase 2: Post-release work
 
-### Verify Release Completeness
+### Verify release completeness
 
 - Verify the GitHub release page is complete and accurate
 - Check that all expected artifacts are attached to the release
 - Confirm the CPE file was generated and uploaded
 - Test installation using the new release
 
-### Notify Stakeholders
+### Notify stakeholders
 
 - Notify relevant teams about the new release
 - Gardener OS Extension Team
 - Update any documentation referencing supported versions
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

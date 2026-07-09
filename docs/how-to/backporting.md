@@ -34,7 +34,7 @@ This guide covers how to create patch releases and backport packages in Garden L
 
 For foundational knowledge on package creation and repository structure, see the [Packaging Rules](/reference/packaging-rules.md) reference.
 
-## Creating Patch Releases
+## Creating patch releases
 
 When running the GitHub Actions job with `release: true`, it automatically creates a new release with version suffix `gl0` (or `gardenlinux0` in older packages). To create a patch release for this version:
 
@@ -81,9 +81,9 @@ git push origin <VERSION>
 
 If the action is set up to run on `push` (as in the basic example), this will trigger the build job. The job will detect that this is a new version and create the necessary tags and GitHub releases.
 
-## Backporting Examples
+## Backporting examples
 
-### Backporting New Upstream Version Not Available (yet) on Salsa
+### Backporting new upstream version not available (yet) on Salsa
 
 When backporting a version not available (yet) in Debian salsa (e.g., OpenSSL 3.1.7), configure the `prepare_source` script as follows:
 
@@ -97,7 +97,7 @@ version_suffix=gl0~bp1443
 
 This configuration fetches source files from the upstream repository while using the Debian folder from the apt source package. If there are compatibility issues, patches may need to be added using the `apply_patches` function.
 
-### Backporting Package Already in Nightly Releases
+### Backporting package already in nightly releases
 
 For packages available in Debian testing and tracked in salsa (e.g., `jq` version `1.8.1`):
 
@@ -111,7 +111,7 @@ git_src -b "debian/$version" https://salsa.debian.org/debian/jq.git
 version_suffix=gl0+bp1877
 ```
 
-### Backporting Missing Salsa Sources (Last Resort)
+### Backporting missing Salsa sources (last resort)
 
 :::warning
 Use this method only as a last resort when source code is not available in Debian salsa or when upstream sources differ significantly. In all other cases, this method is discouraged.
@@ -140,6 +140,6 @@ snapshot_src "$pkg" "$snapshot_timestamp"
 Debian snapshots can be useful for determining when Garden Linux snapshots contain a certain package version. For example, visit https://snapshot.debian.org/package/sqlite3/3.46.1-7/ to find the date `2025-07-26`, then use `bin/garden-version --major 2025-07-26` to get `1943` as a candidate version for `snapshot_gl_version`.
 :::
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

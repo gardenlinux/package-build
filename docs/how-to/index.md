@@ -31,13 +31,13 @@ github_target_path: docs/how-to/packaging/index.md
 
 The Garden Linux packaging system enables the creation of customized operating system images through a modular approach. This guide provides an overview of the complete package release lifecycle and links to detailed how-to guides for each stage.
 
-## Release Hierarchy
+## Release hierarchy
 
 Garden Linux uses a [three-tier release hierarchy](/explanation/release-hierarchy.md) to deliver a complete operating system.
 
 This document is about the first tier, the [Packaging Ecosystem](/how-to/releases/package-releases).
 
-## Package Release Lifecycle
+## Package release lifecycle
 
 Creating and releasing packages in Garden Linux follows a structured process:
 
@@ -50,13 +50,13 @@ Creating and releasing packages in Garden Linux follows a structured process:
 5. **[Managing Dependencies](/how-to/packaging/build-dependencies.md)**: Handle special build-time dependencies with bp-package repositories
 6. **[Excluding Packages](/how-to/packaging/null-releases.md)**: Use NULL releases to temporarily exclude problematic packages from builds
 
-## Core Concepts
+## Core concepts
 
 - **[Packaging Rules](/reference/packaging-rules.md)**: Authoritative reference for all naming conventions and procedural rules
 - **[Package Sources](/explanation/package-sources.md)**: Understand the different types of package sources in Garden Linux
 - **[Repository Infrastructure](https://github.com/gardenlinux/repo/blob/main/docs/explanation/infrastructure.md)**: Learn how packages are assembled into apt repositories
 
-## Getting Started
+## Getting started
 
 1. Review the [Packaging Rules](/reference/packaging-rules.md) for naming conventions and repository structure
 2. Choose a package to work on (either a new package or modifying an existing one)
