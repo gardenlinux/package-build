@@ -32,7 +32,7 @@ github_target_path: docs/explanation/packaging.md
 
 This document explains how Garden Linux packages are built using the tools in the `package-build` repository and how they fit into the broader packaging ecosystem.
 
-## Release Hierarchy
+## Release hierarchy
 
 Garden Linux uses a [three-tier release hierarchy](/explanation/release-hierarchy.md) to deliver a complete operating system.
 
@@ -58,7 +58,7 @@ Each custom-built package has its own GitHub repository following the naming con
 
 These repositories are built using the tools in the `package-build` repository.
 
-## Package Flow Process Overview
+## Package flow process overview
 
 1. **Source Management**: Package source lives in `package-{package_name}` repos
 2. **Building**: Packages are built using tools from `package-build` repo
@@ -66,14 +66,14 @@ These repositories are built using the tools in the `package-build` repository.
 3. **Release Assembly**: Built packages are collected and assembled into APT repositories by the `repo` workflow
 4. **Distribution**: Final APT repository is published and made available to users
 
-## Key Relationships
+## Key relationships
 
 - Each `package-*` repo declares its build dependencies in its source
 - The `package-build` repo provides common tooling used by all `package-*` repos
 - The [`repo`](https://github.com/gardenlinux/repo) orchestrates the final release by collecting built packages and dependencies
 - Users access packages through the standard APT system pointing to Garden Linux repositories
 
-## Understanding Package Versions
+## Understanding package versions
 
 Garden Linux packages typically follow versioning like:
 
@@ -91,6 +91,6 @@ Where:
 
 When creating patch releases or backports, the suffix is incremented (e.g., `~gardenlinux1`, `~gardenlinux2`) or modified for specific use cases (like `~bp1443` for backports).
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

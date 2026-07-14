@@ -28,7 +28,7 @@ github_source_path: docs/how-to/local-build.md
 github_target_path: docs/how-to/packaging/local-build.md
 ---
 
-# Local Package Building
+# Local package building
 
 This guide covers how to build Garden Linux packages locally using the `package-build` tools.
 
@@ -38,7 +38,7 @@ This guide covers how to build Garden Linux packages locally using the `package-
 - Sufficient disk space for builds
 - Access to the Garden Linux package repositories
 
-## Build Process
+## Build process
 
 ### 1. Clone the package-build repository
 
@@ -66,11 +66,11 @@ Execute the build script from the package-build repository, passing your package
 If your package build depends on other custom build packages, you can provide the `--build-dependencies` flag with a directory containing the `.deb` files of build-time dependencies.
 :::
 
-## Build Artifacts
+## Build artifacts
 
 The build artifacts (`.deb` files and others) are placed in a `.build` directory within your package repository. For example: `./package-iproute2/.build/`.
 
-## Build Options
+## Build options
 
 The `build` script supports several options to customize the build process:
 
@@ -81,6 +81,6 @@ The `build` script supports several options to customize the build process:
 - `--build-dependencies`: Path to a directory containing `.deb` files to be used as build-time dependencies
 - `--edit`: Spawn a gardenlinux/repo-debian-snapshort container with `package-XYZ/output` mounted, quilt installed and configured
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

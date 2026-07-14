@@ -32,15 +32,15 @@ github_target_path: docs/how-to/packaging/remove-packages.md
 
 There may be cases where we need to switch back to using Debian-provided packages instead of Garden Linux-built packages.
 
-## Important Considerations
+## Important considerations
 
 :::danger
 DO NOT RENAME PACKAGE REPOS
 
-Renaming package repositories will break future patch releases, as the `package-releases` file references repositories by their exact names. Additionally, you should disable GitHub Actions for the repository to prevent version updates from overwriting the null release.
+Renaming package repositories will break future patch releases, as the `package-releases` file references repositories by their exact names. Also, you should disable GitHub Actions for the repository to prevent version updates from overwriting the null release.
 :::
 
-## Procedure to Nullify a Package
+## Procedure to nullify a package
 
 To remove a Garden Linux package and revert to the Debian version:
 

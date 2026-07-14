@@ -125,7 +125,7 @@ For detailed patching procedures, see the [Patching](/how-to/packaging/patching.
 
 ## Step 2: Make the Source Package
 
-A source package contains all necessary files to build the binaries and serves as input for the binary build step.
+A source package contains all necessary files to build the binaries and is the input for the binary build step.
 
 The gardenlinux/package-build repository provides reusable actions to perform this step automatically. See the [build.yml workflow](https://github.com/gardenlinux/package-build/blob/621c4c8f530a93884f7b9a4dfc348a50a2d19aa5/.github/workflows/build.yml#L29) for reference.
 
@@ -184,6 +184,6 @@ Packages for patch releases are uploaded to GitHub Releases but must be manually
 
 For complete details on apt repository creation, see the [Creating APT Repository Releases](/how-to/releases/apt-repos.md) guide.
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

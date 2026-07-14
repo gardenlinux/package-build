@@ -43,7 +43,7 @@ NULL releases are used to:
 - Exclude packages with licensing or security issues
 - Mark deprecated packages
 
-## How NULL Releases Work
+## How NULL releases work
 
 The null release mechanism operates through several components in the Garden Linux infrastructure:
 
@@ -93,7 +93,7 @@ to re-enable a package that was previously disabled with a NULL release, you hav
 ## Important Considerations
 
 :::danger
-If you want to permanently remove/archive a package from Garden Linux, please follow the [official guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo) in the gardenlinux/repo repository.
+If you want to permanently remove/archive a package from Garden Linux, follow the [official guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo) in the gardenlinux/repo repository.
 :::
 
 :::warning

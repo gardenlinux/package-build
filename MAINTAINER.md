@@ -111,7 +111,7 @@ Since prepare_source is invoked directly in the package-build pipeline as step i
 
 ### Get debian/ folder
 
-The debian folder contains patches, configurations and rules to make and install the software. For more details about the required content of that debian folder, please read [debian documentation](https://www.debian.org/doc/manuals/maint-guide/dreq.en.html).
+The debian folder contains patches, configurations and rules to make and install the software. For more details about the required content of that debian folder, read [debian documentation](https://www.debian.org/doc/manuals/maint-guide/dreq.en.html).
 
 To create a Garden Linux package, we also need a **debian/ folder** including all the required files.
 In the following we define how we **SHOULD** get the debian folder, depending on the case:
@@ -161,7 +161,7 @@ git_src --branch <BRANCH NAME> <GIT_REPO_URL>
 Garden Linux Patches are applied on top of debian patches. 
 
 > [!WARNING]
-> please see patching guide --- insert link here --- 
+> see patching guide --- insert link here --- 
 
 #### Rule 7: Patching debian patches 
 We consider the debian/patches folder as source, and changes to debian/patches are done and tracked via patches. 
@@ -208,7 +208,7 @@ The central gardenlinux/package-build repo contains reusable actions, that are u
 Input for this stage is a debian source package created by the previous stage.
 The central gardenlinux/package-build repo contains reusable actions, that are used to automatically perform this step, as well. 
 
-You can add a `prepare_binary` script to the package-XYZ repo to additionally perform some preparations before the binary build step is executed. 
+You can add a `prepare_binary` script to the package-XYZ repo to perform additional preparations before the binary build step is executed. 
 You could for example reconfigure debian build profiles, install build dependencies or add some logging flags for debugging.
 
 # Test binary package 
@@ -238,7 +238,7 @@ Packages for patch releases are also uploaded to the GitHub Release page, but mu
 If a package-XYZ build must be excluded in next nightly apt repositories, a so called "NULL release" must be published for package-XYZ. 
 
 > [!IMPORTANT]
-> If you want to remove/archive a package from Garden Linux by creating a null release, please follow this [guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo).
+> If you want to remove/archive a package from Garden Linux by creating a null release, follow this [guide](https://github.com/gardenlinux/repo?tab=readme-ov-file#remove-garden-linux-packages-from-the-repo).
 
 ### What happens under the hood
 The [fetch_releases](https://github.com/gardenlinux/repo/blob/main/fetch_releases) script runs as part of the github actions of gardenlinux/repo. 

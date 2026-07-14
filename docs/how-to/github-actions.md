@@ -89,6 +89,6 @@ jobs:
       release: ${{ github.ref == 'refs/heads/main' }}
 ```
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />

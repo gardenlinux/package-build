@@ -57,6 +57,6 @@ Packages with native sources are used when:
 
 - The source code is developed and maintained by the Garden Linux developers, so Debian does not package it
 
-## Related Topics
+## Related topics
 
 <RelatedTopics />
