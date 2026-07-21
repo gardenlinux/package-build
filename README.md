@@ -8,10 +8,10 @@ local and CI-based package building.
 
 To find detailed how-to-guides about the different stages of the package release
 lifecycle, check out
-[our packaging section](https://gardenlinux-docs.netlify.app/how-to/packaging/),
-our documentation on [package sources](https://gardenlinux-docs.netlify.app/explanation/package-sources.html#package-sources)
-or our [packaging rules](https://gardenlinux-docs.netlify.app/reference/packaging-rules.html)
-in [our documentation hub](https://gardenlinux-docs.netlify.app/)
+[our packaging section](https://docs.gardenlinux.org/how-to/packaging/),
+our documentation on [package sources](https://docs.gardenlinux.org/explanation/package-sources.html#package-sources)
+or our [packaging rules](https://docs.gardenlinux.org/reference/packaging-rules.html)
+in [our documentation hub](https://docs.gardenlinux.org/)
 
 # Community
 
@@ -34,7 +34,7 @@ https://lists.neonephos.org/g/gardenlinux-security-embargo
 We welcome your contributions to Gardenlinux or any supporting projects.
 
 To find our more, visit our
-[Contributor Documentation](https://gardenlinux-docs.netlify.app/contributing).
+[Contributor Documentation](https://docs.gardenlinux.org/contributing).
 
 ## Licensing
 
