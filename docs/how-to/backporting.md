@@ -18,10 +18,6 @@ related_topics:
   - /how-to/packaging/build-dependencies.md
   - /how-to/packaging/null-releases.md
   - /reference/packaging-rules.md
-migration_status: "done"
-migration_issue: "https://github.com/gardenlinux/gardenlinux/issues/4705"
-migration_stakeholder: "@tmangold, @yeoldegrove, @ByteOtter"
-migration_approved: false
 github_org: gardenlinux
 github_repo: package-build
 github_source_path: docs/how-to/backporting.md
