@@ -72,6 +72,9 @@ if [ -n "$build_dep_dir" ]; then
 	mount_opts+=(-v "$build_dep_dir:/opt/package_build/workdir/build_dep:Z")
 fi
 
+# TEMPORARY FIX for https://github.com/actions/runner-images/issues/14473
+OCI_RUNTIME=$(command -v crun); alias podman="podman --runtime $OCI_RUNTIME"
+
 if [ -n "$edit" ]; then
   podman run --security-opt seccomp=unconfined --arch "$arch" -ti --rm "${mount_opts[@]}" -w "/opt/package_build/workdir/output" -e leave_artifacts="$leave_artifacts" "$container" /opt/package_build/bin/patchenv-init
   exit $?
