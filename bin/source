@@ -233,6 +233,9 @@ snapshot_src() (
 	snapshot="$2"
 	base_url="${3:-https://packages.gardenlinux.io}"
 
+  tmp_dir="$(mktemp -d)"
+  trap 'cd / && rm -rf "$tmp_dir"' EXIT
+
 	command -v curl >/dev/null || apt-get install --no-install-recommends -y curl >&2
 	command -v gunzip >/dev/null || apt-get install --no-install-recommends -y gzip >&2
 	command -v xz >/dev/null || apt-get install --no-install-recommends -y xz-utils >&2
@@ -247,7 +250,7 @@ snapshot_src() (
 		sources_url="${base_url}/debian-snapshot/dists/${snapshot}/main/source/Sources.gz"
 		echo "Using snapshot timestamp $snapshot" >&2
 	fi
-	if ! curl -sSLf "$sources_url" | gunzip >Sources; then
+	if ! curl -sSLf "$sources_url" | gunzip >"$tmp_dir/Sources"; then
 		echo "Error: Failed to download Sources file from $sources_url" >&2
 		exit 1
 	fi
@@ -269,7 +272,7 @@ snapshot_src() (
 			package_started = 1;
 			print
 		}
-	' Sources)
+	' "$tmp_dir/Sources")
 
 	if [ -z "$package_section" ]; then
 		echo "Error: Package '$pkg' not found in snapshot" >&2
