@@ -30,7 +30,7 @@ on:
         default: '["amd64", "arm64"]'
 jobs:
   source:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     outputs:
       pkg: ${{ steps.tag.outputs.pkg }}
       version: ${{ steps.tag.outputs.version }}
@@ -100,7 +100,7 @@ jobs:
             echo skip_release=true >> "$GITHUB_OUTPUT"
           fi
   binary:
-    runs-on: ${{ matrix.arch == 'amd64' && inputs.runs-on-amd64 || matrix.arch == 'arm64' && inputs.runs-on-arm64 || inputs.run-on }}
+    runs-on: ${{ matrix.arch == 'amd64' && inputs.runs-on-amd64 || matrix.arch == 'arm64' && inputs.runs-on-arm64 || inputs.runs-on }}
     needs: source
     if: ${{ ! needs.source.outputs.skip_build }}
     strategy:
@@ -159,7 +159,7 @@ jobs:
           include-hidden-files: true
           path: .build
   release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     needs: [source, binary]
     if: ${{ (! needs.source.outputs.skip_release) && inputs.publish_release }}
     steps:
