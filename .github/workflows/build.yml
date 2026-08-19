@@ -40,10 +40,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: resolve container digest
         run: |
+          set -eo pipefail
           if [ ! -e .container ]; then
             image="ghcr.io/gardenlinux/repo-debian-snapshot"
-            podman pull "$image"
-            podman image inspect --format='{{index .RepoDigests 0}}' "$image" > .container
+            digest=$(skopeo inspect --raw "docker://${image}" | sha256sum | awk '{print $1}')
+            echo "${image}@sha256:${digest}" > .container
           fi
       - name: set release version suffix
         if: inputs.release
