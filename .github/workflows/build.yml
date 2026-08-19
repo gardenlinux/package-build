@@ -43,8 +43,7 @@ jobs:
           if [ ! -e .container ]; then
             image="ghcr.io/gardenlinux/repo-debian-snapshot"
             podman pull "$image"
-            digest="$(podman image inspect --format '{{ .Digest }}' "$image")"
-            echo "$image@$digest" > .container
+            podman image inspect --format='{{index .RepoDigests 0}}' "$image" > .container
           fi
       - name: set release version suffix
         if: inputs.release
