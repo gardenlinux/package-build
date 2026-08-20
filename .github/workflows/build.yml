@@ -36,9 +36,23 @@ jobs:
       version: ${{ steps.tag.outputs.version }}
       skip_build: ${{ steps.tag.outputs.skip_build }}
       skip_release: ${{ steps.tag.outputs.skip_release }}
+      skip_build: ${{ steps.tag.outputs.skip_build || steps.disable_check.outputs.skip_build }}
+      skip_release: ${{ steps.tag.outputs.skip_release || steps.disable_check.outputs.skip_release }}
     steps:
       - uses: actions/checkout@v4
+      - name: check for disable file
+        id: disable_check
+        run: |
+          if [ -f disable ]; then
+            echo "Disable file found, skipping all subsequent steps."
+            echo "disable=true" >> "$GITHUB_OUTPUT"
+            echo "skip_build=true" >> "$GITHUB_OUTPUT"
+            echo "skip_release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "disable=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: resolve container digest
+        if: ${{ steps.disable_check.outputs.disable != 'true' }}
         run: |
           set -eo pipefail
           if [ ! -e .container ]; then
@@ -47,11 +61,11 @@ jobs:
             echo "${image}@sha256:${digest}" > .container
           fi
       - name: set release version suffix
-        if: inputs.release
+        if: ${{ inputs.release && steps.disable_check.outputs.disable != 'true' }}
         run: |
           echo 'version_suffix=gl0' >> prepare_source
       - name: commit
-        if: inputs.release
+        if: ${{ inputs.release && steps.disable_check.outputs.disable != 'true' }}
         run: |
           git checkout --detach HEAD
           git add .
@@ -59,11 +73,13 @@ jobs:
           git config user.name "GitHub Actions"
           git commit -m "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       - name: build source pkg
+        if: ${{ steps.disable_check.outputs.disable != 'true' }}
         run: |
           dir="$(mktemp -d)"
           git clone --depth=1 https://github.com/gardenlinux/package-build "$dir/package-build"
           "$dir/package-build/build" --source-only .
       - uses: actions/upload-artifact@v4
+        if: ${{ steps.disable_check.outputs.disable != 'true' }}
         with:
           name: source
           include-hidden-files: true
@@ -72,7 +88,7 @@ jobs:
             !.git
       - id: tag
         name: check version
-        if: inputs.publish_release
+        if: ${{ inputs.publish_release && steps.disable_check.outputs.disable != 'true' }}
         run: |
           ls -lah .build
           if [ -f .build/skip_everything ]; then
