@@ -37,7 +37,7 @@ jobs:
       skip_build: ${{ steps.tag.outputs.skip_build }}
       skip_release: ${{ steps.tag.outputs.skip_release }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: resolve container digest
         run: |
           set -eo pipefail
@@ -63,7 +63,7 @@ jobs:
           dir="$(mktemp -d)"
           git clone --depth=1 https://github.com/gardenlinux/package-build "$dir/package-build"
           "$dir/package-build/build" --source-only .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: source
           include-hidden-files: true
@@ -116,7 +116,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends podman uidmap slirp4netns gh
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: source
       - name: fetch build dependencies
@@ -153,7 +153,7 @@ jobs:
             build=any
           fi
           "$dir/package-build/build" --binary-only --arch "$arch" --build "$build" .
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: binary-${{ matrix.arch }}
           include-hidden-files: true
@@ -163,12 +163,12 @@ jobs:
     needs: [source, binary]
     if: ${{ (! needs.source.outputs.skip_release) && inputs.publish_release }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         if: contains(fromJson(inputs.arch), 'amd64')
         with:
           name: binary-amd64
           path: .build
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         if: contains(fromJson(inputs.arch), 'arm64')
         with:
           name: binary-arm64
