@@ -45,7 +45,7 @@ The [`package-build`](https://github.com/gardenlinux/package-build) repository p
 
 ## Source Package Repositories (`package-*`)
 
-Each custom-built package has its own GitHub repository following the naming convention `package-{package_name}` (e.g., `package-containerd`, `package-openssh`). These repositories contain:
+Each custom-built package has its own GitHub repository following the naming convention `package-{package_name}` (for example, `package-containerd`, `package-openssh`). These repositories contain:
 
 - The source code or references to upstream sources
 - Build scripts and configuration
@@ -71,21 +71,51 @@ These repositories are built using the tools in the `package-build` repository.
 
 ## Understanding package versions
 
-Garden Linux packages typically follow versioning like:
+Garden Linux packages follow versioning like:
 
 ```
-<upstream_version>-<debian_revision>~gardenlinux<sequence>
+<upstream_version>-<debian_revision>gl<gl_increment>[+bp<garden_linux_major>]
 ```
 
-For example: `1.2.3-1~gardenlinux0`
+For example: `8.21.0-2gl0+bp2150`
 
 Where:
 
-- `1.2.3` is the upstream version
-- `-1` is the Debian revision
-- `~gardenlinux0` indicates this is the first Garden Linux rebuild
+- `8.21.0` is the upstream version
+- `-2` is the Debian revision
+- `gl0` is the Garden Linux build increment, starting at `gl0` (`gardenlinux0` for older releases) and incremented for each new GL rebuild of the same upstream+Debian version (for example, `gl1`, `gl2`)
+- `+bp2150` identifies the Garden Linux major release this build targets (2150.x in this example)
 
-When creating patch releases or backports, the suffix is incremented (e.g., `~gardenlinux1`, `~gardenlinux2`) or modified for specific use cases (like `~bp1443` for backports).
+### Version suffix and branch model
+
+Each `package-*` repository uses a multi-branch model:
+
+| Branch | Purpose | Tag suffix |
+|---|---|---|
+| `main` | Nightly / development track. Feeds daily GL snapshot releases. | None — tags like `8.21.0-2gl0` |
+| `rel-<N>` | Maintenance branch for a specific supported GL major release `N`. | `+bp<N>` — tags like `8.21.0-2gl0+bp2150` |
+
+The `version_suffix` variable in the `prepare_source` script controls which suffix the build system appends:
+
+- On `main`, the CI auto-appends `gl0` when `release: true` is set in the workflow input.
+- On `rel-<N>` branches, `version_suffix` is set explicitly in `prepare_source`, for example `version_suffix=gl0+bp2150`.
+
+The build system reads `version_suffix` to form the package version and the git tag. When the same upstream version is rebuilt (for example, to fix a build dependency), the increment is bumped: `gl0` → `gl1`.
+
+### Examples using `package-curl`
+
+| Tag | Branch | Meaning |
+|---|---|---|
+| `8.21.0-2gl0` | `main` | First GL build of curl `8.21.0-2`; nightly |
+| `8.21.0-2gl0+bp1877` | `rel-1877` | Backport of curl `8.21.0-2` for GL 1877.x |
+| `8.21.0-2gl0+bp2150` | `rel-2150` | Backport of curl `8.21.0-2` for GL 2150.x |
+| `8.20.0-2gl1+bp2150` | `rel-2150` | Second Backport of curl `8.20.0-2` for GL 2150.x |
+
+::: note Version encoding
+
+The `+` character in git tags corresponds to `~` (tilde) in the Debian package version string stored inside `prepare_source` (for example, `version_suffix=gl0~bp2150`). The tilde sorts lower in Debian version comparison, which ensures the backport version sorts below the corresponding nightly version in APT. The build system translates `~` to `+` when creating the git tag.
+
+:::
 
 ## Related topics
 

@@ -30,33 +30,68 @@ This guide covers how to create patch releases and backport packages in Garden L
 
 For foundational knowledge on package creation and repository structure, see the [Packaging Rules](/reference/packaging-rules.md) reference.
 
+## Branch and tag conventions
+
+Each `package-*` repository uses a [multi-branch model and version suffixes](/explanation/packaging#Version-suffix-and-branch-model) to separate nightly development from stable release maintenance.
+
+### Tags
+
+Tags on `package-<name>` reposotories correspond with the [Package Versions](/explanation/packaging#understanding-package-versions)
+
+### Setting the version suffix
+
+The `version_suffix` variable in `prepare_source` controls the tag:
+
+- On `main`: no `version_suffix` line. The CI auto-appends `gl0` when `release: true` is set in the workflow call.
+- On `rel-<N>`: set `version_suffix` explicitly in `prepare_source` (typically at the end of the file), for example:
+
+  ```bash
+  # in prepare_source on branch rel-2150
+  version_suffix=gl0+bp2150
+  ```
+
+:::info
+Inside `prepare_source`, you may also write `version_suffix=gl0~bp2150` (with a tilde). The tilde ensures the backport version sorts below the corresponding nightly version in APT. The build system translates `~` to `+` when creating the git tag.
+:::
+
 ## Creating patch releases
 
-When running the GitHub Actions job with `release: true`, it automatically creates a new release with version suffix `gl0` (or `gardenlinux0` in older packages). To create a patch release for this version:
+A patch release delivers an updated package version to an already-shipped Garden Linux release. You work on the `rel-<N>` branch that corresponds to the target release.
+
+The example below uses `package-curl` targeting Garden Linux 2150.x. The starting tag is `8.21.0-2gl0+bp2150` and the goal is to produce patch tag `8.21.0-2gl1+bp2150`.
 
 ### 1. Check out the release tag
 
 ```bash
+git clone https://github.com/gardenlinux/package-curl
+cd package-curl
 git fetch --tags
-git checkout <VERSION>gl0
-git branch <VERSION>
-git checkout <VERSION>
+git checkout 8.21.0-2gl0+bp2150
+git switch -c patch/8.21.0-2gl1+bp2150
 ```
+
+This creates a local working branch from the release tag so you can make and review changes before pushing to the permanent `rel-2150` branch.
 
 ### 2. Apply modifications
 
-Make the necessary changes or backport patches from the main branch. For detailed patching guidance, see the [Patching](/how-to/packaging/patching.md) guide.
+Make the necessary changes or backport patches from `main`. For detailed patching guidance, see the [Patching](/how-to/packaging/patching.md) guide.
 
 ### 3. Increment the version suffix
 
-The GitHub Actions job that created the `<VERSION>gl0` tag automatically added a `version_suffix=gl0` line to the `prepare_source` script. Simply increment this suffix.
+In `prepare_source`, increment the `gl` counter in `version_suffix`:
 
-In certain scenarios where you want to backport to an older Garden Linux version, you will also need to update the `.container` file and use the appropriate container image.
+```bash
+# before
+version_suffix=gl0+bp2150
+
+# after
+version_suffix=gl1+bp2150
+```
+
+When targeting an older Garden Linux release, you may also need to update the `.container` file to use the matching build container image.
 
 :::tip
-You can use the [`bin/find-build-container-for`](https://github.com/gardenlinux/gardenlinux/blob/016c3889e20cb4bd937da4338f88c380cd9a49be/bin/find-build-container-for) script to find the correct container image.
-
-e.g.
+Use the [`bin/find-build-container-for`](https://github.com/gardenlinux/gardenlinux/blob/016c3889e20cb4bd937da4338f88c380cd9a49be/bin/find-build-container-for) script to find the correct container image.
 
 ```bash
 bin/find-build-container-for 2150.0.0
@@ -65,23 +100,29 @@ ghcr.io/gardenlinux/repo-debian-snapshot@sha256:99f72494ab45d33958a0385054de4742
 
 :::
 
-### Optional: Build Locally
+### Optional: Build locally
 
-To check if your package builds before pushing it, refer to the [local Build How-To](/how-to/packaging/local-build.md).
+To verify your package builds before pushing, see the [Local Build How-To](/how-to/packaging/local-build.md).
 
-### 4. Push the branch
+### 4. Push to the release branch
 
 ```bash
-git push origin <VERSION>
+git push origin HEAD:rel-2150
 ```
 
-If the action is set up to run on `push` (as in the basic example), this will trigger the build job. The job will detect that this is a new version and create the necessary tags and GitHub releases.
+The workflow on `rel-2150` triggers on push. Because `version_suffix` is already set in `prepare_source`, the build system reads it, creates the tag `8.21.0-2gl1+bp2150`, and publishes the GitHub release automatically.
+
+:::info
+On `rel-<N>` branches, `release: true` does **not** need to be set in the workflow call. The `version_suffix` in `prepare_source` is sufficient for tag creation and release publishing. The `release: true` input is only needed on `main`, where no suffix is pre-set, to trigger auto-appending `gl0`.
+:::
 
 ## Backporting examples
 
+The examples below show how to configure `prepare_source` on a `rel-<N>` branch for different source scenarios. In each case, work on the branch that corresponds to the target Garden Linux release (for example, `rel-1877` for GL 1877.x or `rel-2150` for GL 2150.x).
+
 ### Backporting new upstream version not available (yet) on Salsa
 
-When backporting a version not available (yet) in Debian salsa (e.g., OpenSSL 3.1.7), configure the `prepare_source` script as follows:
+When backporting a version not available (yet) in Debian salsa (for example, OpenSSL 3.1.7 targeted at GL 1443.x), configure `prepare_source` on branch `rel-1443` as follows:
 
 ```bash
 version_orig=3.1.7
@@ -95,7 +136,7 @@ This configuration fetches source files from the upstream repository while using
 
 ### Backporting package already in nightly releases
 
-For packages available in Debian testing and tracked in salsa (e.g., `jq` version `1.8.1`):
+For packages available in Debian testing and tracked in salsa (for example, `jq` version `1.8.1` targeted at GL 1877.x), configure `prepare_source` on branch `rel-1877`:
 
 ```bash
 pkg=jq
@@ -113,7 +154,7 @@ version_suffix=gl0+bp1877
 Use this method only as a last resort when source code is not available in Debian salsa or when upstream sources differ significantly. In all other cases, this method is discouraged.
 :::
 
-For packages present in Garden Linux nightly snapshots but not in salsa (e.g., `sqlite3` version `3.46.1`):
+For packages present in Garden Linux nightly snapshots but not in salsa (for example, `sqlite3` version `3.46.1` targeted at GL 1877.x), configure `prepare_source` on branch `rel-1877`:
 
 ```bash
 pkg=sqlite3

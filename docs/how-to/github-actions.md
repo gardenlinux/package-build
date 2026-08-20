@@ -85,6 +85,42 @@ jobs:
       release: ${{ github.ref == 'refs/heads/main' }}
 ```
 
+## Release branches (`rel-*`)
+
+Each `package-*` repository uses a [multi-branch model and version suffixes](/explanation/packaging#Version-suffix-and-branch-model) to separate nightly development from stable release maintenance.
+
+### How the workflow differs on `rel-<N>` branches
+
+There are two key differences compared to `main`:
+
+**1. The `release` input is always `false` for pushes to `rel-<N>`.**
+
+The condition `${{ github.ref == 'refs/heads/main' }}` evaluates to `false` on a push to `rel-2150`. This is intentional: on `rel-<N>` branches, the `version_suffix` is already set explicitly in `prepare_source` (for example, `version_suffix=gl0+bp2150`). The build system reads that suffix and creates the tag and GitHub release automatically, without needing `release: true` to append the suffix.
+
+**2. `build_dep` pins dependencies to the same `+bp<N>` versions.**
+
+On `main`, [build dependencies](/how-to/packaging/build-dependencies) are not usually pinned. On a `rel-<N>` branch, other packages may also exist only as backported `+bp<N>` releases that are not in the default nightly apt repository. The `build_dep` input lists these explicit dependencies:
+
+```yaml
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+jobs:
+  build:
+    uses: gardenlinux/package-build/.github/workflows/build.yml@main
+    with:
+      release: ${{ github.ref == 'refs/heads/main' }}
+      build_dep: |
+        gardenlinux/bp-package-ngtcp2 1.22.1-1gl0+bp2150
+        gardenlinux/package-nghttp2 1.68.1-1gl0+bp2150
+        gardenlinux/package-openssl 3.5.5-1gl21+bp2150
+        gardenlinux/package-gnutls 3.8.13-1gl0+bp2150
+```
+
+This example is taken from [`package-curl` on `rel-2150`](https://github.com/gardenlinux/package-curl/blob/e8f171157619e6ee39e75e42dab097e41eb32590/.github/workflows/build.yml).
+
 ## Related topics
 
 <RelatedTopics />
