@@ -367,22 +367,37 @@ add_sbom() (
 	sbom_name="${3:-unknown}"
 	sbom_version="${4:-$version}"
 	syft_pkgname="syft_${SYFT_RELEASE}_linux_$(dpkg --print-architecture).deb"
+	cataloger="+sbom-cataloger,-binary,-linux-kernel-cataloger"
 
 	# update and install sbom build dependencies
 	if [ ! -e ".build/$syft_pkgname" ]; then
+		# download
 		apt-get update
 		DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends wget
 		mkdir -p ".build"	
 		wget --quiet "https://github.com/anchore/syft/releases/download/v${SYFT_RELEASE}/$syft_pkgname" -O ".build/$syft_pkgname"
 	fi
+
+	# verify integrity of checksum files
+	find /opt/package_build/sbom
+	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.sig" > ".build/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked"
+	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.pem" | openssl x509 -pubkey > ".build/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked"
+	openssl dgst -verify ".build/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked" -signature ".build/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked" "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt"
+
+	# verify checksum of downloaded binary
+	cd .build
+	sha256sum --ignore-missing --check "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt"
+	cd ..
+
+	# install syft binary
 	DEBIAN_FRONTEND=nontinteractive apt-get install --assume-yes --no-install-recommends "./.build/$syft_pkgname"
 
 	# for debug/logging
-	syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --output table
+	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output table
 
 	# for effect
 	mkdir -p "$debian_dir/$sbom_name/DEBIAN/"
-	syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --output cyclonedx-json="$debian_dir/sbom.cdx.json"
+	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output cyclonedx-json="$debian_dir/sbom.cdx.json"
 
 	cat >> "$debian_dir/rules" << EOF
 
