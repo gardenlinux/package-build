@@ -95,7 +95,7 @@ There are two key differences compared to `main`:
 
 **1. The `release` input is always `false` for pushes to `rel-<N>`.**
 
-The condition `${{ github.ref == 'refs/heads/main' }}` evaluates to `false` on a push to `rel-2150`. This is intentional: on `rel-<N>` branches, the `version_suffix` is already set explicitly in `prepare_source` (for example, `version_suffix=gl0+bp2150`). The build system reads that suffix and creates the tag and GitHub release automatically, without needing `release: true` to append the suffix.
+The condition <span v-pre>`${{ github.ref == 'refs/heads/main' }}`</span> evaluates to `false` on a push to `rel-2150`. This is intentional: on `rel-<N>` branches, the `version_suffix` is already set explicitly in `prepare_source` (for example, `version_suffix=gl0+bp2150`). The build system reads that suffix and creates the tag and GitHub release automatically, without needing `release: true` to append the suffix.
 
 **2. `build_dep` pins dependencies to the same `+bp<N>` versions.**
 
