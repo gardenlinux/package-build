@@ -3,6 +3,8 @@
 set -exuo pipefail
 shopt -s nullglob
 
+
+
 auto_decompress() (
 	case "${1##*.}" in
 		gz)
@@ -344,6 +346,51 @@ handle_leave_artifacts_exit() (
 	mv "$dir" $output_run_dir
 	mv $output_run_dir/src $output_run_dir/a
 	cp -r $output_run_dir/a $output_run_dir/b
+)
+
+# add_sbom creates and prints a cyclonedx sbom of the source directory. the sbom file
+# is then added to the control.tar.xz archive within the debian archive. the sbom will
+# not be part of the installed files.
+#
+# Usage:
+# add_sbom "src_dir" "debian_dir" "sbom_name" "sbom_version"
+# - src_dir      : the (modified src dir) from prepare_source. defaults to "$dir/src"
+# - debian_dir   : path to the debian package instructions directory. defaults to "$src_dir/debian"
+# - sbom_name    : name of the package
+# - sbom_version : release version
+add_sbom() (
+	# see builder/Dockerfile (from https://github.com/gardenlinux/builder) for matching syft versions
+	local SYFT_RELEASE="1.45.1"
+
+	src_dir="${1:-$dir/src}"
+	debian_dir="${2:-$src_dir/debian}"
+	sbom_name="${3:-unknown}"
+	sbom_version="${4:-$version}"
+	syft_pkgname="syft_${SYFT_RELEASE}_linux_$(dpkg --print-architecture).deb"
+
+	# update and install sbom build dependencies
+	if [ ! -e ".build/$syft_pkgname" ]; then
+		apt-get update
+		DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends wget
+		mkdir -p ".build"	
+		wget --quiet "https://github.com/anchore/syft/releases/download/v${SYFT_RELEASE}/$syft_pkgname" -O ".build/$syft_pkgname"
+	fi
+	DEBIAN_FRONTEND=nontinteractive apt-get install --assume-yes --no-install-recommends "./.build/$syft_pkgname"
+
+	# for debug/logging
+	syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --output table
+
+	# for effect
+	mkdir -p "$debian_dir/$sbom_name/DEBIAN/"
+	syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --output cyclonedx-json="$debian_dir/sbom.cdx.json"
+
+	cat >> "$debian_dir/rules" << EOF
+
+override_dh_builddeb:
+	mkdir -p "$debian_dir/$sbom_name/DEBIAN/"
+	cp "debian/sbom.cdx.json" "debian/$sbom_name/DEBIAN/sbom.cdx.json"
+	dh_builddeb
+EOF
 )
 
 email="contact@gardenlinux.io"
