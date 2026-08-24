@@ -396,13 +396,22 @@ add_sbom() (
 	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output table
 
 	# for effect
-	mkdir -p "$debian_dir/$sbom_name/DEBIAN/"
-	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output cyclonedx-json="$debian_dir/sbom.cdx.json"
+	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output cyclonedx-json="./.build/sbom.cdx.json"
 
+	# compress and make ascii postable (base64)
+	xz --stdout ./.build/sbom.cdx.json > ./.build/sbom.cdx.json.xz
+	base64 ./.build/sbom.cdx.json.xz > ./.build/sbom.cdx.json.xz.base64
+
+	# copy build artefact to debian build directory to survive until binary build step later
+	cp ./.build/sbom.cdx.json "$debian_dir"
+	cp ./.build/sbom.cdx.json.xz.base64 "$debian_dir"
+
+	# add base64 sbom variable to the control file
 	cat >> "$debian_dir/rules" << EOF
 
 override_dh_builddeb:
-	mkdir -p "$debian_dir/$sbom_name/DEBIAN/"
+	mkdir -p "debian/$sbom_name/DEBIAN/"
+	echo "X-CycloneDX-Base64: \$\$(cat debian/sbom.cdx.json.xz.base64 | tr -d '\\n')" >> "debian/$sbom_name/DEBIAN/control"
 	cp "debian/sbom.cdx.json" "debian/$sbom_name/DEBIAN/sbom.cdx.json"
 	dh_builddeb
 EOF
