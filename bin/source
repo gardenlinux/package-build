@@ -368,6 +368,8 @@ add_sbom() (
 	sbom_version="${4:-$version}"
 	syft_pkgname="syft_${SYFT_RELEASE}_linux_$(dpkg --print-architecture).deb"
 	cataloger="+sbom-cataloger,-binary,-linux-kernel-cataloger"
+	sbom_format="cyclonedx-json"
+	sbom_filename="$sbom_name.cdx.sbom"
 
 	# update and install sbom build dependencies
 	if [ ! -e ".build/$syft_pkgname" ]; then
@@ -396,24 +398,17 @@ add_sbom() (
 	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output table
 
 	# for effect
-	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output cyclonedx-json="./.build/sbom.cdx.json"
+	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output "$sbom_format"="./.build/$sbom_filename"
 
-	# compress and make ascii postable (base64)
-	xz --stdout ./.build/sbom.cdx.json > ./.build/sbom.cdx.json.xz
-	base64 ./.build/sbom.cdx.json.xz > ./.build/sbom.cdx.json.xz.base64
+	# copy build artefact to debian build directory to survive until dh_install step later
+	cp ./.build/$sbom_filename "$debian_dir"
 
-	# copy build artefact to debian build directory to survive until binary build step later
-	cp ./.build/sbom.cdx.json "$debian_dir"
-	cp ./.build/sbom.cdx.json.xz.base64 "$debian_dir"
-
-	# add base64 sbom variable to the control file
+	# add install sbom step to rules
 	cat >> "$debian_dir/rules" << EOF
 
-override_dh_builddeb:
-	mkdir -p "debian/$sbom_name/DEBIAN/"
-	echo "X-CycloneDX-Base64: \$\$(cat debian/sbom.cdx.json.xz.base64 | tr -d '\\n')" >> "debian/$sbom_name/DEBIAN/control"
-	cp "debian/sbom.cdx.json" "debian/$sbom_name/DEBIAN/sbom.cdx.json"
-	dh_builddeb
+override_dh_install:
+	dh_install
+	install -D -m 755 "debian/$sbom_filename" "debian/$sbom_name/usr/share/gardenlinux/sbom/$sbom_filename"
 EOF
 )
 
