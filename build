@@ -66,6 +66,7 @@ fi
 mount_opts=(
 	-v "$src_dir/bin:/opt/package_build/bin:Z"
 	-v "$dir:/opt/package_build/workdir:Z"
+	-v "$src_dir/sbom:/opt/package_build/sbom:Z"
 )
 
 if [ -n "$build_dep_dir" ]; then
