@@ -348,9 +348,9 @@ handle_leave_artifacts_exit() (
 	cp -r $output_run_dir/a $output_run_dir/b
 )
 
-# add_sbom creates and prints a cyclonedx sbom of the source directory. the sbom file
-# is then added to the control.tar.xz archive within the debian archive. the sbom will
-# not be part of the installed files.
+# add_sbom creates and prints a cyclonedx sbom of the source directory finding any build dependency
+# files (e.g. go.mod, cargo.toml). The resulting sbom is then added to the installation artifacts at
+# /usr/share/gardenlinux/sbom/.
 #
 # Usage:
 # add_sbom "src_dir" "debian_dir" "sbom_name" "sbom_version"
@@ -381,7 +381,6 @@ add_sbom() (
 	fi
 
 	# verify integrity of checksum files
-	find /opt/package_build/sbom
 	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.sig" > ".build/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked"
 	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.pem" | openssl x509 -pubkey > ".build/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked"
 	openssl dgst -verify ".build/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked" -signature ".build/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked" "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt"
@@ -392,7 +391,7 @@ add_sbom() (
 	cd ..
 
 	# install syft binary
-	DEBIAN_FRONTEND=nontinteractive apt-get install --assume-yes --no-install-recommends "./.build/$syft_pkgname"
+	DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "./.build/$syft_pkgname"
 
 	# for debug/logging
 	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output table
@@ -408,7 +407,7 @@ add_sbom() (
 
 override_dh_install:
 	dh_install
-	install -D -m 755 "debian/$sbom_filename" "debian/$sbom_name/usr/share/gardenlinux/sbom/$sbom_filename"
+	install -D -m 644 "debian/$sbom_filename" "debian/$sbom_name/usr/share/gardenlinux/sbom/$sbom_filename"
 EOF
 )
 
