@@ -4,6 +4,12 @@ SPDX-PackageSupplier = "GardenLinux authors <gardenlinux-admin@lists.neonephos.o
 SPDX-PackageDownloadLocation = "https://github.com/gardenlinux/package-build"
 
 [[annotations]]
+path = "sbom/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2020 Anchore"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
 path = "**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2020-2026 SAP SE or an SAP affiliate company and Gardenlinux contributors"
