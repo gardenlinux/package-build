@@ -371,33 +371,37 @@ add_sbom() (
 	sbom_format="cyclonedx-json"
 	sbom_filename="$sbom_name.cdx.sbom"
 
+	# add subdirectory as workdir which can be ignored for artifact upload later
+	mkdir -p ".build/.cache"
+
 	# update and install sbom build dependencies
-	if [ ! -e ".build/$syft_pkgname" ]; then
+	if [ ! -e ".build/.cache/$syft_pkgname" ]; then
 		# download
 		apt-get update
 		DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends wget
-		mkdir -p ".build"
-		wget --quiet "https://github.com/anchore/syft/releases/download/v${SYFT_RELEASE}/$syft_pkgname" -O ".build/$syft_pkgname"
+		wget --quiet "https://github.com/anchore/syft/releases/download/v${SYFT_RELEASE}/$syft_pkgname" -O ".build/.cache/$syft_pkgname"
 	fi
 
 	# verify integrity of checksum files
-	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.sig" > ".build/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked"
-	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.pem" | openssl x509 -pubkey > ".build/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked"
-	openssl dgst -verify ".build/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked" -signature ".build/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked" "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt"
+	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.sig" > ".build/.cache/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked"
+	base64 -d "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt.pem" | openssl x509 -pubkey > ".build/.cache/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked"
+	openssl dgst -verify ".build/.cache/syft_${SYFT_RELEASE}_checksums.txt.pem.unpacked" -signature ".build/.cache/syft_${SYFT_RELEASE}_checksums.txt.sig.unpacked" "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt"
 
 	# verify checksum of downloaded binary
-	cd .build
+	cd .build/.cache
 	sha256sum --ignore-missing --check "/opt/package_build/sbom/syft_${SYFT_RELEASE}_checksums.txt"
-	cd ..
+	cd ../..
 
 	# install syft binary
-	DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "./.build/$syft_pkgname"
+	cd .build/.cache
+	DEBIAN_FRONTEND=noninteractive apt-get install --assume-yes --no-install-recommends "./$syft_pkgname"
+	cd ../..
 
 	# for debug/logging
-	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output table
+	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/.cache/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output table
 
 	# for effect
-	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output "$sbom_format"="./.build/$sbom_filename"
+	SYFT_FORMAT_PRETTY=true SYFT_CACHE_DIR=".build/.cache/syft-cache" syft "$src_dir" --source-name "$sbom_name" --source-version "$sbom_version" --select-catalogers "$cataloger" --output "$sbom_format"="./.build/$sbom_filename"
 
 	# copy build artefact to debian build directory to survive until dh_install step later
 	cp ./.build/$sbom_filename "$debian_dir"
