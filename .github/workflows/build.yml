@@ -70,7 +70,7 @@ jobs:
           path: |
             .
             !.git
-            !.cache
+            !.build/.cache
       - id: tag
         name: check version
         if: inputs.publish_release
