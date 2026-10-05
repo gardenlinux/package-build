@@ -194,3 +194,7 @@ jobs:
           version="${{ needs.source.outputs.version }}"
           tar -C .build -cv . | xz | split --bytes=1G --suffix-length=4 --numeric-suffix - build.tar.xz.
           gh release create "$version" --latest=${{ inputs.latest }} --verify-tag --title "${pkg}_${version}" --notes-file $RELEASE_NOTES build.tar.xz.*
+
+          if [ -f ".build/${pkg}.cdx.sbom" ]; then
+            gh release upload "$version" ".build/${pkg}.cdx.sbom"
+          fi
