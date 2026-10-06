@@ -365,7 +365,7 @@ add_sbom() (
 	src_dir="${1:-$dir/src}"
 	debian_dir="${2:-$src_dir/debian}"
 	sbom_name="${3:-unknown}"
-	sbom_version="${4:-$version}"
+	sbom_version="${4:-$version$version_suffix}"
 	syft_pkgname="syft_${SYFT_RELEASE}_linux_$(dpkg --print-architecture).deb"
 	cataloger="+sbom-cataloger,-binary,-linux-kernel-cataloger"
 	sbom_format="cyclonedx-json"
