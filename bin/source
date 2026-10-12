@@ -66,7 +66,7 @@ apt_src() (
 
 	orig=(*.orig.tar.*)
 	if [ -n "${orig[*]}" ]; then
-		[ "$ignore_orig" = true ] || auto_decompress "$orig" | tee "$dir/orig.tar" | tar --extract --strip-components 1 --directory "$dir/src"
+		[ "$ignore_orig" = true ] || auto_decompress "$orig" | tee "$dir/orig.tar" | tar --extract --no-same-user --strip-components 1 --directory "$dir/src"
 		rm "${orig[@]}"
 	fi
 
