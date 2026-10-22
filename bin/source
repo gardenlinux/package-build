@@ -148,7 +148,7 @@ import_upstream_patches() (
 # Usage:
 # pkg_version_in_gl_version <package_name> <version> <start_version> [max_versions] [base_url]
 #
-# Searches for a snapshot by searching through Garden Linux versions (e.g., 1882.0, 1881.0, etc.).
+# Searches for a snapshot by searching through Garden Linux versions (e.g., 1882.0, 2396.0.0, etc.).
 # - <package_name>: The source package name to search for
 # - <version>: The exact version to find (e.g., "3.8.9-3")
 # - <start_version>: Starting GL version to search from (e.g., "1882")
@@ -175,11 +175,19 @@ pkg_version_in_gl_version() (
 
 	versions_checked=0
 	while [ "$versions_checked" -lt "$max_versions" ]; do
-		current_version="${major}.${minor}"
-		sources_url="${base_url}/gardenlinux/dists/${current_version}/main/source/Sources.gz"
-		echo "Checking GL version $current_version at $sources_url..." >&2
+		current_version=""
+		# GL now uses semantic versioning, so we check e.g. 2332.0 and 2332.0.0
+		for candidate in "${major}.${minor}" "${major}.${minor}.0"; do
+			sources_url="${base_url}/gardenlinux/dists/${candidate}/main/source/Sources.gz"
+			echo "Checking GL version $candidate at $sources_url..." >&2
 
-		if curl -sSLf "$sources_url" -o "${tmp_dir}/sources_${current_version}.gz" 2>/dev/null; then
+			if curl -sSLf "$sources_url" -o "${tmp_dir}/sources_${candidate}.gz" 2>/dev/null; then
+				current_version="$candidate"
+				break
+			fi
+		done
+
+		if [ -n "$current_version" ]; then
 			echo "Found GL version $current_version, checking for package..." >&2
 
 			if gunzip -c "${tmp_dir}/sources_${current_version}.gz" >"${tmp_dir}/sources_${current_version}.txt" 2>/dev/null; then
@@ -211,7 +219,7 @@ pkg_version_in_gl_version() (
 
 			rm -f "${tmp_dir}/sources_${current_version}.gz"
 		else
-			echo "GL version $current_version not found or not accessible" >&2
+			echo "GL version ${major}.${minor} not found or not accessible" >&2
 		fi
 
 		major=$((major + 1))
