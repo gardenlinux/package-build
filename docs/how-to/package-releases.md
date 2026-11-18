@@ -55,14 +55,14 @@ In tier one, individual [packages](/explanation/packaging.md) will need updates 
 
 | Package        | Version policy                                    |
 |----------------|---------------------------------------------------|
-| [linux](https://github.com/gardenlinux/package-linux)        | 🔒 Stay on current major version                  |
-| [glibc](https://github.com/gardenlinux/bp-package-glibc)       | 🔒 Stay on current major version                  |
-| [openssl](https://github.com/gardenlinux/package-openssl)      | 🔒 Stay on current major version                  |
-| [systemd](https://github.com/gardenlinux/package-systemd)      | 🔒 Stay on current major version                  |
-| [containerd](https://github.com/gardenlinux/package-containerd)   | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
-| [golang](https://github.com/gardenlinux/package-golang)       | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
-| [runc](https://github.com/gardenlinux/package-runc)         | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
-| [curl](https://github.com/gardenlinux/package-curl)         | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
+| [linux](https://github.com/gardenlinux/package-linux)        |  Stay on current major version                  |
+| [glibc](https://github.com/gardenlinux/bp-package-glibc)       |  Stay on current major version                  |
+| [openssl](https://github.com/gardenlinux/package-openssl)      |  Stay on current major version                  |
+| [systemd](https://github.com/gardenlinux/package-systemd)      |  Stay on current major version                  |
+| [containerd](https://github.com/gardenlinux/package-containerd)   |  Minor updates · Major upgrades if aligned  |
+| [golang](https://github.com/gardenlinux/package-golang)       |  Minor updates · Major upgrades if aligned  |
+| [runc](https://github.com/gardenlinux/package-runc)         |  Minor updates · Major upgrades if aligned  |
+| [curl](https://github.com/gardenlinux/package-curl)         |  Minor updates · Major upgrades if aligned  |
 
 For each package requiring an update, follow the [Package Backporting Guide](/how-to/packaging/backporting.md).
 
