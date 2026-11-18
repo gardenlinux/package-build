@@ -55,11 +55,11 @@ In tier one, individual [packages](/explanation/packaging.md) will need updates 
 
 | Package        | Version policy                                    |
 |----------------|---------------------------------------------------|
-| `containerd`   | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
-| `glibc`        | 🔒 Stay on current major version                  |
 | `linux`        | 🔒 Stay on current major version                  |
-| `systemd`      | 🔒 Stay on current major version                  |
+| `glibc`        | 🔒 Stay on current major version                  |
 | `openssl`      | 🔒 Stay on current major version                  |
+| `systemd`      | 🔒 Stay on current major version                  |
+| `containerd`   | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
 | `golang`       | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
 | `runc`         | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
 | `curl`         | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
