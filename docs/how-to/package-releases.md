@@ -19,7 +19,7 @@ related_topics:
   - /how-to/packaging/null-releases.md
   - /reference/packaging-rules.md
 github_org: gardenlinux
-github_repo: gardenlinux
+github_repo: package-build
 github_source_path: docs/how-to/package-releases.md
 github_target_path: docs/how-to/releases/package-releases.md
 ---
@@ -52,14 +52,17 @@ Before creating a package release, ensure you have:
 
 In tier one, individual [packages](/explanation/packaging.md) will need updates based on recent CVEs or upstream releases. Check for potential upgrades in important packages:
 
-- golang
-- containerd
-- runc
-- curl
-- openssl
-- systemd
-- glibc
-- linux kernel
+
+| Package        | Version policy                                    |
+|----------------|---------------------------------------------------|
+| `containerd`   | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
+| `glibc`        | 🔒 Stay on current major version                  |
+| `linux`        | 🔒 Stay on current major version                  |
+| `systemd`      | 🔒 Stay on current major version                  |
+| `openssl`      | 🔒 Stay on current major version                  |
+| `golang`       | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
+| `runc`         | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
+| `curl`         | ✅ Minor updates · ⚠️ Major upgrades if aligned  |
 
 For each package requiring an update, follow the [Package Backporting Guide](/how-to/packaging/backporting.md).
 
