@@ -35,6 +35,8 @@ To build packages using GitHub Actions, define a job that uses the package-build
 ```yaml
 jobs:
   build:
+    permissions:
+      contents: write
     uses: gardenlinux/package-build/.github/workflows/build.yml@main
 ```
 
@@ -80,6 +82,8 @@ on:
     - cron: "0 0 * * *"
 jobs:
   build:
+    permissions:
+      contents: write
     uses: gardenlinux/package-build/.github/workflows/build.yml@main
     with:
       release: ${{ github.ref == 'refs/heads/main' }}
@@ -109,6 +113,8 @@ on:
     - cron: "0 0 * * *"
 jobs:
   build:
+    permissions:
+      contents: write
     uses: gardenlinux/package-build/.github/workflows/build.yml@main
     with:
       release: ${{ github.ref == 'refs/heads/main' }}
