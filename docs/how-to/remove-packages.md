@@ -82,3 +82,7 @@ This process ensures that:
 - No new builds will be triggered for the package
 - The `repo` will import the package from Debian instead of using a Garden Linux build
 - Future patch releases for the Garden Linux version will continue to work correctly
+
+## Related topics
+
+<RelatedTopics />

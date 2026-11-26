@@ -73,7 +73,7 @@ These repositories are built using the tools in the `package-build` repository.
 
 Garden Linux packages follow versioning like:
 
-```
+```text
 <upstream_version>-<debian_revision>gl<gl_increment>[+bp<garden_linux_major>]
 ```
 
@@ -111,7 +111,7 @@ The build system reads `version_suffix` to form the package version and the git 
 | `8.21.0-2gl0+bp2150` | `rel-2150` | Backport of curl `8.21.0-2` for GL 2150.x |
 | `8.20.0-2gl1+bp2150` | `rel-2150` | Second Backport of curl `8.20.0-2` for GL 2150.x |
 
-::: note Version encoding
+::: info Version encoding
 
 The `+` character in git tags corresponds to `~` (tilde) in the Debian package version string stored inside `prepare_source` (for example, `version_suffix=gl0~bp2150`). The tilde sorts lower in Debian version comparison, which ensures the backport version sorts below the corresponding nightly version in APT. The build system translates `~` to `+` when creating the git tag.
 

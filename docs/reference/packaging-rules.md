@@ -33,7 +33,7 @@ To ensure clear identification and standardized tooling, package repositories fo
 
 ### Rule 1: Package repositories must be named accordingly
 
-```
+```text
 package-<package-source>
 ```
 
