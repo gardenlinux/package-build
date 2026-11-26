@@ -232,14 +232,23 @@ pkg_version_in_gl_version() (
 )
 
 # Usage:
-# snapshot_src <package_name> <snapshot> [base_url]
+# snapshot_src <package_name>[=<version>] <snapshot> [base_url]
 #
 # Downloads and extracts source files from a Garden Linux snapshot repository.
-# - <package_name>: The source package name to download
+# - <package_name>: The source package name to download. Append =<version> to
+#                   pin an exact version (e.g. "acl=2.4.0-1"); omitting the
+#                   version picks the latest available in the snapshot.
 # - <snapshot>: The snapshot timestamp or GL version to use (e.g. "1754597610" or "gl:1982")
 # - [base_url]: Optional base URL (defaults to https://packages.gardenlinux.io)
 snapshot_src() (
-	pkg="$1"
+	# Support pkg=version syntax (consistent with apt_src)
+	if [[ "$1" = *=* ]]; then
+		pkg="${1%%=*}"
+		req_version="${1#*=}"
+	else
+		pkg="$1"
+		req_version=""
+	fi
 	snapshot="$2"
 	base_url="${3:-https://packages.gardenlinux.io}"
 
@@ -265,24 +274,26 @@ snapshot_src() (
 		exit 1
 	fi
 
-	package_section=$(awk -v pkg="$pkg" '
-		/^Package: / {
-			if ($2 == pkg) {
-				in_package = 1;
-				next
-			} else {
-				in_package = 0;
-				next
-			}
-		}
-		in_package && /^$/ && package_started {
-			exit
-		}
-		in_package {
-			package_started = 1;
-			print
-		}
-	' "$tmp_dir/Sources")
+	# Use paragraph mode (RS="") so each Sources stanza is one record; $1 is its first line.
+	# Emit all stanzas matching exactly "Package: <pkg>" as null-delimited records, then
+	# pick the one with the requested version or (if none specified) the latest version.
+	package_section=""
+	best_version=""
+	while IFS= read -r -d '' stanza; do
+		ver=$(printf '%s\n' "$stanza" | grep "^Version:" | cut -d' ' -f2)
+		[ -n "$ver" ] || continue
+		if [ -n "$req_version" ]; then
+			if [ "$ver" = "$req_version" ]; then
+				package_section="$stanza"
+				break
+			fi
+		else
+			if [ -z "$best_version" ] || dpkg --compare-versions "$ver" gt "$best_version"; then
+				best_version="$ver"
+				package_section="$stanza"
+			fi
+		fi
+	done < <(awk -v pkg="$pkg" 'BEGIN{RS=""; FS="\n"; ORS="\0"} $1 == "Package: " pkg' "$tmp_dir/Sources")
 
 	if [ -z "$package_section" ]; then
 		echo "Error: Package '$pkg' not found in snapshot" >&2
